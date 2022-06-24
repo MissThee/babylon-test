@@ -8,11 +8,14 @@ export default (name: string = 'ground') => {
             height: 50 // z轴方向宽度
         })
         ground.position.y = -5
-        ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, {
-            mass: 0,
-            restitution: 1,
-            friction: 1
-        })
+        ground.physicsImpostor = new BABYLON.PhysicsImpostor(
+            ground, BABYLON.PhysicsImpostor.BoxImpostor,
+            {
+                mass: 0,
+                restitution: 1,
+                friction: 1
+            }
+        )
     }
     return ground
 }

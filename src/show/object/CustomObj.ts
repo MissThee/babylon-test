@@ -1,4 +1,6 @@
 import * as  BABYLON from "babylonjs";
+import FollowMouseObj from "../util/FollowMouseObj";
+import * as Constant from "../util/Constant";
 
 class CustomObj {
     scene: BABYLON.Scene
@@ -7,14 +9,43 @@ class CustomObj {
     pointerDragBehavior?: BABYLON.PointerDragBehavior
     isLockedPosition: boolean = false
     options?
+    _followJoint?: BABYLON.PhysicsJoint
 
-    constructor(scene: BABYLON.Scene, name: string = 'TextBox', options?: { materialOpt?: { textureUrl?: string; } }) {
+    constructor(scene: BABYLON.Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
         this.useMaterial()
-        this.usePointerDragBehavior()
         this.usePhysicsImpostor()
+        this.updateDrag()
+    }
+
+    updateDrag() {
+        // ------------------------直接拖动------------------------
+        if (!this.pointerDragBehavior) {
+            this.pointerDragBehavior = new BABYLON.PointerDragBehavior({dragPlaneNormal: new BABYLON.Vector3(1, 0, 0)});
+            this.pointerDragBehavior.dragDeltaRatio = 1
+            this.pointerDragBehavior.useObjectOrientationForDragging = false
+
+            // 在物理模拟生效时拖动需增加一下配置，以暂停被抓去物体的物理效果
+            // this.pointerDragBehavior?.onDragStartObservable.add((event) => {
+            //     this.mesh.physicsImpostor?.sleep();
+            //     console.log("dragStart", event);
+            // })
+            // this.pointerDragBehavior?.onDragObservable.add((event) => {
+            //     console.log("drag", event);
+            // })
+            // this.pointerDragBehavior?.onDragEndObservable.add((event) => {
+            //     this.mesh.physicsImpostor?.wakeUp()
+            //     this.mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
+            //     console.log("dragEnd", event);
+            // })
+        }
+        if (this.isLockedPosition) {
+            this.mesh.addBehavior(this.pointerDragBehavior);
+        } else {
+            this.mesh.removeBehavior(this.pointerDragBehavior)
+        }
     }
 
     useMaterial() {
@@ -23,34 +54,14 @@ class CustomObj {
         this.mesh.material = this.material;
     }
 
-    usePointerDragBehavior() {
-        this.pointerDragBehavior = new BABYLON.PointerDragBehavior({dragPlaneNormal: new BABYLON.Vector3(1, 0, 0)});
-        this.pointerDragBehavior.dragDeltaRatio = 1
-        this.mesh.addBehavior(this.pointerDragBehavior);
-    }
-
     usePhysicsImpostor() {
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 1, // 质量，0时静止不动
             restitution: 0.4, // 碰撞弹力
             friction: 1, // 接触摩擦力
         }, this.scene);
-
-        if (this.pointerDragBehavior) {
-            this.pointerDragBehavior.useObjectOrientationForDragging = false
-        }
-        this.pointerDragBehavior?.onDragStartObservable.add((event) => {
-            this.mesh.physicsImpostor?.sleep();
-            console.log("dragStart", event);
-        })
-        this.pointerDragBehavior?.onDragObservable.add((event) => {
-            console.log("drag", event);
-        })
-        this.pointerDragBehavior?.onDragEndObservable.add((event) => {
-            this.mesh.physicsImpostor?.wakeUp()
-            console.log("dragEnd", event);
-        })
     }
+
 
     lockObj(param?: { position: [x: number, y: number, z: number], rotation?: [x: number, y: number, z: number] }): void
     lockObj(param?: { position?: [x: number, y: number, z: number], rotation: [x: number, y: number, z: number] }): void
@@ -80,6 +91,7 @@ class CustomObj {
         } else {
             this.usePhysicsImpostor()
         }
+        this.updateDrag()
     }
 }
 
