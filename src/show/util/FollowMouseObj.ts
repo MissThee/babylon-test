@@ -18,7 +18,7 @@ class FollowMouseObj {
 
     constructor(scene: BABYLON.Scene) {
         this.scene = scene
-        this.mesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {}, this.scene)
+        this.mesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {segments: 1}, this.scene)
         this.mesh.isPickable = false
         this.mesh.isVisible = false
         this.initMaterial()
@@ -33,7 +33,8 @@ class FollowMouseObj {
     }
 
     initImpostor() {
-        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.NoImpostor)
+        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.NoImpostor, {mass: 0, restitution: 0}, this.scene)
+        this.mesh.physicsImpostor.physicsBody.collisionFilterMask = 0
     }
 
     initFollowMouseAction() {

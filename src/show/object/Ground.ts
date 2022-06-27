@@ -5,7 +5,7 @@ export default (name: string = 'ground') => {
     {
         ground = BABYLON.MeshBuilder.CreateGround(name, {
             width: 20, // x轴方向宽度
-            height: 50 // z轴方向宽度
+            height: 100 // z轴方向宽度
         })
         ground.position.y = -5
         ground.physicsImpostor = new BABYLON.PhysicsImpostor(

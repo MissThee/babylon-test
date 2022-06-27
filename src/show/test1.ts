@@ -44,12 +44,12 @@ ClickSound(canvasEl)
 Ground()
 
 const customObjOptions = [
-    {name: "textBox1", option: {materialOpt: {textureUrl: "/image/side1.png"}}, initPosition: [0, 4, 0]},
-    {name: "textBox2", option: {materialOpt: {textureUrl: "/image/side2.png"}}, initPosition: [0, 5, 3]},
-    {name: "textBox3", option: {materialOpt: {textureUrl: "/image/side3.png"}}, initPosition: [0, 6, 6]},
-    {name: "textBox4", option: {materialOpt: {textureUrl: "/image/side4.png"}}, initPosition: [0, 9, 5]},
-    {name: "textBox5", option: {materialOpt: {textureUrl: "/image/side5.png"}}, initPosition: [0, 11, 2]},
-    {name: "textBox6", option: {materialOpt: {textureUrl: "/image/side6.png"}}, initPosition: [0, 13, -1]},
+    {name: "textBox1", option: {materialOpt: {textureUrl: "/image/side1.png"}}, initPosition: [0, 12, 0]},
+    {name: "textBox2", option: {materialOpt: {textureUrl: "/image/side2.png"}}, initPosition: [0, 12, 3]},
+    {name: "textBox3", option: {materialOpt: {textureUrl: "/image/side3.png"}}, initPosition: [0, 12, 6]},
+    {name: "textBox4", option: {materialOpt: {textureUrl: "/image/side4.png"}}, initPosition: [0, 8, 1]},
+    {name: "textBox5", option: {materialOpt: {textureUrl: "/image/side5.png"}}, initPosition: [0, 8, 5]},
+    {name: "textBox6", option: {materialOpt: {textureUrl: "/image/side6.png"}}, initPosition: [0, 4, 3]},
 ]
 const customObjArr: CustomObj[] = []
 customObjOptions.forEach(e => {
@@ -57,7 +57,6 @@ customObjOptions.forEach(e => {
     box.mesh.position = new BABYLON.Vector3(...e.initPosition)
     customObjArr.push(box)
 })
-
 
 // ------------------------物理弹力拖动------------------------
 const followMouseObj = new FollowMouseObj(scene)
@@ -103,28 +102,182 @@ scene.onPointerObservable.add((pointerInfo) => {
     }
 })
 
-
-let lockPosition = false
-const lockPositionInfo: Array<[x: number, y: number, z: number]> = [
+// ------------------------固定静态位置切换------------------------
+let isStaticLock = false
+const staticLockPositionInfo: Array<[x: number, y: number, z: number]> = [
     [0, 7, 3], [0, 7, 5], [0, 7, 7], [0, 5, 4], [0, 5, 6], [0, 3, 5],
 ]
-
-window.addEventListener('dblclick', () => {
-    lockPosition = !lockPosition
-    if (lockPosition) {
+const staticLock = (enable: boolean) => {
+    isStaticLock = enable
+    if (enable) {
         customObjArr.forEach((e, index) => {
-            e.lockObj({position: lockPositionInfo[index], rotation: [0, 0, 0]})
+            e.lockObj({position: staticLockPositionInfo[index], rotation: [0, 0, 0]})
         })
     } else {
         customObjArr.forEach(e => {
             e.lockObj()
         })
     }
+}
+const addLockStaticPositionControl = () => {
+    const inputEl = document.createElement('input')
+    inputEl.type = 'button'
+    inputEl.id = 'lockStaticPositionBtn'
+    inputEl.style.display = 'block'
+    inputEl.value = 'lockStaticPosition 静态钉住'
+    inputEl.onclick = () => {
+        staticLock(true)
+    }
+    document.getElementById('controls')?.append(inputEl)
+}
+addLockStaticPositionControl()
+
+// ------------------------固定弹力位置------------------------
+let isStickLock = false
+let stickObjArr: { mainMesh: BABYLON.Mesh, pointMesh: BABYLON.Mesh, joint: BABYLON.PhysicsJoint }[] = []
+const stickPosition = (enable: boolean) => {
+    isStickLock = enable
+    stickObjArr.forEach(stickObj => {
+        if (stickObj.mainMesh.physicsImpostor && stickObj.pointMesh.physicsImpostor && stickObj.joint) {
+            scene.getPhysicsEngine()?.removeJoint(stickObj.mainMesh.physicsImpostor, stickObj.pointMesh.physicsImpostor, stickObj.joint)
+        }
+        if (stickObj.pointMesh) {
+            stickObj.pointMesh.dispose();
+        }
+    })
+    stickObjArr = []
+    if (!enable) {
+        return
+    }
+
+    const stickPositionCenterArr = [
+        new BABYLON.Vector3(0, 12, -3),
+        new BABYLON.Vector3(0, 12, 3),
+        new BABYLON.Vector3(0, 12, 9),
+        new BABYLON.Vector3(0, 8, -1),
+        new BABYLON.Vector3(0, 8, 7),
+        new BABYLON.Vector3(0, 4, 3),
+    ]
+    stickPositionCenterArr.forEach((stickPositionCenter, stickPositionCenterIndex) => {
+        const verticalMargin = 5
+        const horizontalMargin = 5
+
+        const meshStickPositionTop1 = stickPositionCenter.clone()
+        meshStickPositionTop1.y += verticalMargin
+        meshStickPositionTop1.z -= horizontalMargin
+        const meshStickPositionTop2 = stickPositionCenter.clone()
+        meshStickPositionTop2.y += verticalMargin
+        meshStickPositionTop2.z += horizontalMargin
+        const meshStickPositionBottom1 = stickPositionCenter.clone()
+        meshStickPositionBottom1.y -= verticalMargin
+        meshStickPositionBottom1.z -= horizontalMargin
+        const meshStickPositionBottom2 = stickPositionCenter.clone()
+        meshStickPositionBottom2.y -= verticalMargin
+        meshStickPositionBottom2.z += horizontalMargin
+
+        const stickPointArray = [meshStickPositionTop1, meshStickPositionTop2, meshStickPositionBottom1, meshStickPositionBottom2]
+        const pivotDistance = 1
+        const pivotArray = [
+            new BABYLON.Vector3(0, pivotDistance, -pivotDistance),
+            new BABYLON.Vector3(0, pivotDistance, pivotDistance),
+            new BABYLON.Vector3(0, -pivotDistance, -pivotDistance),
+            new BABYLON.Vector3(0, -pivotDistance, pivotDistance),
+        ]
+        stickPointArray.forEach((stickPoint, stickPointIndex) => {
+            const physicsJoint = new BABYLON.PhysicsJoint(
+                BABYLON.PhysicsJoint.SpringJoint,
+                {
+                    length: 1,
+                    stiffness: 2,
+                    damping: 5,
+                    collision: false,
+                    // mainAxis:new BABYLON.Vector3(0,-1,0),
+                    mainPivot: pivotArray[stickPointIndex], // 方块上的连接点位置
+                    // connectedPivot:new BABYLON.Vector3(0,0,0), // 鼠标上的连接点位置
+                }
+            )
+            const stickMesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {segments: 1}, scene)
+            stickMesh.isVisible = false
+            stickMesh.physicsImpostor = new BABYLON.PhysicsImpostor(stickMesh, BABYLON.PhysicsImpostor.NoImpostor, {mass: 0, restitution: 0}, scene)
+            stickMesh.physicsImpostor.physicsBody.collisionFilterMask = 0
+            stickMesh.position = stickPoint
+            if (stickMesh.physicsImpostor) {
+                customObjArr[stickPositionCenterIndex].mesh.physicsImpostor?.addJoint(stickMesh.physicsImpostor, physicsJoint)
+            }
+            stickObjArr.push({
+                mainMesh: customObjArr[stickPositionCenterIndex].mesh,
+                pointMesh: stickMesh,
+                joint: physicsJoint
+            })
+        })
+    })
+}
+let needApplyImpulse = false
+scene.onPointerObservable.add((pointerInfo) => {
+    if (isStickLock) {
+        switch (pointerInfo.type) {
+            case BABYLON.PointerEventTypes.POINTERDOWN:
+                needApplyImpulse = true
+                break
+            case BABYLON.PointerEventTypes.POINTERMOVE:
+                needApplyImpulse = false
+                break
+            case BABYLON.PointerEventTypes.POINTERUP:
+                if (needApplyImpulse) {
+                    const pickInfo = scene.pick(
+                        scene.pointerX,
+                        scene.pointerY,
+                        (mesh) => customObjArr.some(e => e.mesh === mesh),
+                        true
+                    );
+                    if (pickInfo?.pickedMesh&&pickInfo.ray && pickInfo?.pickedPoint && scene.activeCamera) {
+                        pickInfo.pickedMesh.physicsImpostor?.applyImpulse( pickInfo.ray.origin.normalize().scale(-10) ,pickInfo.pickedPoint)
+                    }
+                }
+                break
+        }
+    }
 })
 
+
+const addStickPositionControl = () => {
+    const inputEl = document.createElement('input')
+    inputEl.type = 'button'
+    inputEl.id = 'stickPositionBtn'
+    inputEl.style.display = 'block'
+    inputEl.value = 'stickPositionBtn 物理弹性钉住'
+    inputEl.onclick = () => {
+        staticLock(false)
+        stickPosition(true)
+    }
+    document.getElementById('controls')?.append(inputEl)
+}
+addStickPositionControl()
+
+
+const addNormalPhysicsControl = () => {
+    const inputEl = document.createElement('input')
+    inputEl.type = 'button'
+    inputEl.id = 'addNormalPhysicsControl'
+    inputEl.style.display = 'block'
+    inputEl.value = 'addNormalPhysicsControl 物理掉落'
+    inputEl.onclick = () => {
+        stickPosition(false)
+        staticLock(false)
+    }
+    document.getElementById('controls')?.append(inputEl)
+}
+addNormalPhysicsControl()
+
+// ------------------------------------------------------------------------
 const beforeRender = () => {
     customObjArr.forEach(e => {
-        e.mesh.position.x = 0
+        if (e.mesh.position.x > 5) {
+            e.mesh.position.x = 5
+        }
+        if (e.mesh.position.x < -5) {
+            e.mesh.position.x = -5
+        }
     })
 }
 

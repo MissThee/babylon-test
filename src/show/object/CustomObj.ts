@@ -49,17 +49,23 @@ class CustomObj {
     }
 
     useMaterial() {
+        if (this.mesh.material) {
+            return
+        }
         this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
         this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl || "/image/testMaterial.png");
         this.mesh.material = this.material;
     }
 
     usePhysicsImpostor() {
+        if (this.mesh.physicsImpostor) {
+            return
+        }
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
             mass: 1, // 质量，0时静止不动
-            restitution: 0.4, // 碰撞弹力
+            restitution: 0, // 碰撞弹力
             friction: 1, // 接触摩擦力
-        }, this.scene);
+        }, this.scene)
     }
 
 
@@ -70,6 +76,7 @@ class CustomObj {
         if (this.isLockedPosition) {
             // 绑定物理效果后不能执行动画，需要先清除物理效果
             this.mesh.physicsImpostor?.dispose()
+            this.mesh.physicsImpostor = null
             const framePerSecond = 10
             const second = 0.8 // 动画持续总时间
             // 位置动画
