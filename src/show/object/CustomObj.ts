@@ -9,7 +9,6 @@ class CustomObj {
     pointerDragBehavior?: BABYLON.PointerDragBehavior
     isLockedPosition: boolean = false
     options?
-    _followJoint?: BABYLON.PhysicsJoint
 
     constructor(scene: BABYLON.Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
         this.options = options
@@ -54,6 +53,8 @@ class CustomObj {
         }
         this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
         this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl || "/image/testMaterial.png");
+        this.material.emissiveColor = new BABYLON.Color3(1, 1, 1)
+        this.material.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05)
         this.mesh.material = this.material;
     }
 
@@ -78,7 +79,7 @@ class CustomObj {
             this.mesh.physicsImpostor?.dispose()
             this.mesh.physicsImpostor = null
             const framePerSecond = 10
-            const second = 0.8 // 动画持续总时间
+            const second = 1.5 // 动画持续总时间
             // 位置动画
             const lockPosition = new BABYLON.Animation("lockPosition", "position", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
             lockPosition.setKeys([
