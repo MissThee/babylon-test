@@ -16,7 +16,7 @@ const stats = new Stats();
 document.body.appendChild(stats.dom)
 const canvasEl = document.getElementById('app') as HTMLCanvasElement;
 
-const canMoveCamera = false
+const canMoveCamera = true
 
 let delta = 0
 // 创建 引擎
@@ -76,20 +76,20 @@ SceneBoard()
 light2.shadowMinZ = 0
 light2.shadowMaxZ = 50
 const shadowGenerator = new BABYLON.ShadowGenerator(1024, light2);
-shadowGenerator.useBlurCloseExponentialShadowMap = true
+// shadowGenerator.useBlurCloseExponentialShadowMap = true
 // shadowGenerator.useBlurExponentialShadowMap = true;
 // shadowGenerator.useKernelBlur=true
-// shadowGenerator.blurKernel=30
-// shadowGenerator.blurScale=20
+// shadowGenerator.blurKernel=10
+// shadowGenerator.blurScale=500
 // shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW
 // shadowGenerator.depthScale=10
 const customObjOptions = [
-    {name: "textBox1", option: {materialOpt: {textureUrl: "/image/side1.png"}}, initPosition: [0, 12, 0]},
-    {name: "textBox2", option: {materialOpt: {textureUrl: "/image/side2.png"}}, initPosition: [0, 12, 3]},
+    {name: "textBox1", option: {materialOpt: {textureUrl: "/image/side1.png"}}, initPosition: [0, 16, 0]},
+    {name: "textBox2", option: {materialOpt: {textureUrl: "/image/side2.png"}}, initPosition: [0, 14, 3]},
     {name: "textBox3", option: {materialOpt: {textureUrl: "/image/side3.png"}}, initPosition: [0, 12, 6]},
-    {name: "textBox4", option: {materialOpt: {textureUrl: "/image/side4.png"}}, initPosition: [0, 8, 1]},
-    {name: "textBox5", option: {materialOpt: {textureUrl: "/image/side5.png"}}, initPosition: [0, 8, 5]},
-    {name: "textBox6", option: {materialOpt: {textureUrl: "/image/side6.png"}}, initPosition: [0, 4, 3]},
+    {name: "textBox4", option: {materialOpt: {textureUrl: "/image/side4.png"}}, initPosition: [0, 10, 7]},
+    {name: "textBox5", option: {materialOpt: {textureUrl: "/image/side5.png"}}, initPosition: [0, 8, 4]},
+    {name: "textBox6", option: {materialOpt: {textureUrl: "/image/side6.png"}}, initPosition: [0, 6, 1]},
 ]
 const customObjArr: CustomObj[] = []
 customObjOptions.forEach(e => {
@@ -152,7 +152,7 @@ scene.onPointerObservable.add((pointerInfo) => {
 // ------------------------固定静态位置切换------------------------
 let isStaticLock = false
 const staticLockPositionInfo: Array<[x: number, y: number, z: number]> = [
-    [0, 7, 3], [0, 7, 5], [0, 7, 7], [0, 5, 4], [0, 5, 6], [0, 3, 5],
+    [0, 11, -3], [0, 9, -1], [0, 7, 1], [0, 5, -1], [0, 5, 1], [0, 7, 3],
 ]
 const staticLock = (enable: boolean) => {
     isStaticLock = enable
@@ -193,19 +193,21 @@ const stickPosition = (enable: boolean) => {
             stickObj.mainMesh.physicsImpostor.friction = 1
         }
     })
-    stickObjArr = []
+    scene.getPhysicsEngine()?.setGravity(new BABYLON.Vector3(0, Constant.gravity, 0))
+
     scene.getEngine()
     if (!enable) {
         return
     }
+    scene.getPhysicsEngine()?.setGravity(new BABYLON.Vector3(0, 0, 0))
 
     const stickPositionCenterArr = [
-        new BABYLON.Vector3(0, 12, -3),
-        new BABYLON.Vector3(0, 12, 3),
-        new BABYLON.Vector3(0, 12, 9),
-        new BABYLON.Vector3(0, 8, -1),
-        new BABYLON.Vector3(0, 8, 7),
-        new BABYLON.Vector3(0, 4, 3),
+        new BABYLON.Vector3(0, 12, -6),
+        new BABYLON.Vector3(0, 12, 0),
+        new BABYLON.Vector3(0, 12, 6),
+        new BABYLON.Vector3(0, 8, -4),
+        new BABYLON.Vector3(0, 8, 4),
+        new BABYLON.Vector3(0, 4, 0),
     ]
     stickPositionCenterArr.forEach((stickPositionCenter, stickPositionCenterIndex) => {
         const verticalMargin = 10
@@ -235,9 +237,9 @@ const stickPosition = (enable: boolean) => {
             const physicsJoint = new BABYLON.PhysicsJoint(
                 BABYLON.PhysicsJoint.SpringJoint,
                 {
-                    length: 2,
-                    stiffness: 15,
-                    damping: 10,
+                    length: 0,
+                    stiffness: 1,
+                    damping: 0,
                     collision: false,
                     // mainAxis:new BABYLON.Vector3(0,-1,0),
                     mainPivot: pivotArray[stickPointIndex], // 方块上的连接点位置
@@ -326,7 +328,7 @@ const addNormalPhysicsControl = () => {
 addNormalPhysicsControl()
 
 // ------------------------------------------------------------------------
-const limitMeshPostion = (mesh: BABYLON.Mesh) => {
+const limitMeshPosition = (mesh: BABYLON.Mesh) => {
     if (mesh.position.x > 6) {
         mesh.position.x = 5
     }
@@ -348,9 +350,9 @@ const limitMeshPostion = (mesh: BABYLON.Mesh) => {
 }
 const beforeRender = () => {
     customObjArr.forEach(e => {
-        limitMeshPostion(e.mesh)
+        limitMeshPosition(e.mesh)
     })
-    limitMeshPostion(followMouseObj.mesh)
+    limitMeshPosition(followMouseObj.mesh)
 }
 
 let prePerformance = 0
