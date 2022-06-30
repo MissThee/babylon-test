@@ -16,6 +16,8 @@ export default (name: string = 'ground') => {
                 friction: 1
             }
         )
+        ground.isPickable = false
+
     }
     return ground
 }

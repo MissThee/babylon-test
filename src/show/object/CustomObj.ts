@@ -1,6 +1,4 @@
 import * as  BABYLON from "babylonjs";
-import FollowMouseObj from "../util/FollowMouseObj";
-import * as Constant from "../util/Constant";
 
 class CustomObj {
     scene: BABYLON.Scene
@@ -14,8 +12,13 @@ class CustomObj {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
+        this.mesh.isPickable = true
         this.useMaterial()
-        this.usePhysicsImpostor()
+        this.mesh.scaling = new BABYLON.Vector3(2, 2, 2)
+        BABYLON.Animation.CreateAndStartAnimation('showOn', this.mesh, 'scaling', 60, 10, BABYLON.Vector3.Zero(), new BABYLON.Vector3(1, 1, 1), BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
+        setTimeout(() => {
+            this.usePhysicsImpostor()
+        }, 1200)
         this.updateDrag()
     }
 
