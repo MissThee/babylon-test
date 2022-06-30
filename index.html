@@ -20,8 +20,10 @@
     </style>
 </head>
 <body>
-<canvas id="app" style="width: 100%;height: 100%;display: block"></canvas>
-<div id="controls" style="position: fixed;top:0;right:0;background: rgba(0,0,0,0.3)"></div>
+<div style="position: relative;overflow: hidden;height: 300px;width: 600px">
+    <canvas id="app" style="width: 100%;height: 100%;display: block;"></canvas>
+    <div id="controls" style="position: absolute;top:0;right:0;background: rgba(0,0,0,0.3)"></div>
+</div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

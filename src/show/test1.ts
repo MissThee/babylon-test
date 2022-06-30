@@ -24,6 +24,7 @@ const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, 
 // 创建 场景
 const scene = new BABYLON.Scene(engine);
 {
+    scene.clearColor=new BABYLON.Color4(247/255,207/255,212/255,1)
     // scene.ambientColor = new BABYLON.Color3(0.87, 0.71, 0.73); // 场景环境光。可让材质的环境光有效果
     scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让材质的环境光有效果
     scene.enablePhysics(new BABYLON.Vector3(0, Constant.gravity, 0), new BABYLON.CannonJSPlugin(true, 1, CANNON));
