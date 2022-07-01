@@ -38,14 +38,14 @@ if (canMoveCamera) {
 // 创建 光源
 const light1 = new Light1(scene)
 // new CoordinateLine()
-// 点击 声音
+// 创建 点击声音
 new ClickSound(scene)
 // SixPicBox(scene)
 // ObjModule(scene)
 new SceneBoard(scene)
-
+// 创建 影子生成器
 const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
-
+// 创建 方块
 const customObjOptions = [
     {name: "textBoxBlue1", option: {materialOpt: {textureUrl: "/image/sideBlue1.png"}}, initPosition: [0, 16, -12]},
     {name: "textBoxBlue2", option: {materialOpt: {textureUrl: "/image/sideBlue2.png"}}, initPosition: [0, 14, -9]},
@@ -72,9 +72,10 @@ setTimeout(() => {
     })
 }, 500)
 
-// 可交互对象，添加交互动作
+// 创建 可交互对象，添加交互动作
 addBehaviors(scene, customObjArr)
 // ------------------------------------------------------------------------
+// 限制物体位置
 const limitMeshPosition = (mesh: BABYLON.Mesh) => {
     if (mesh.position.x > 5) {
         mesh.position.x = 5
@@ -95,7 +96,7 @@ const limitMeshPosition = (mesh: BABYLON.Mesh) => {
         mesh.position.y = 1
     }
 }
-
+// 减少物体角速度
 const reduceRotateSpeed = (meshArr: BABYLON.Mesh[]) => {
     for (let mesh of meshArr) {
         const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
