@@ -4,7 +4,6 @@ class CustomObj {
     scene: BABYLON.Scene
     mesh: BABYLON.Mesh
     material?: BABYLON.StandardMaterial
-    pointerDragBehavior?: BABYLON.PointerDragBehavior
     isLockedPosition: boolean = false
     options?
 
@@ -26,38 +25,9 @@ class CustomObj {
             BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
             new BABYLON.CubicEase(),
             () => {
-                    this.usePhysicsImpostor()
+                this.usePhysicsImpostor()
             }
         )
-        this.updateDrag()
-    }
-
-    updateDrag() {
-        // ------------------------直接拖动------------------------
-        if (!this.pointerDragBehavior) {
-            this.pointerDragBehavior = new BABYLON.PointerDragBehavior({dragPlaneNormal: new BABYLON.Vector3(1, 0, 0)});
-            this.pointerDragBehavior.dragDeltaRatio = 1
-            this.pointerDragBehavior.useObjectOrientationForDragging = false
-
-            // 在物理模拟生效时拖动需增加一下配置，以暂停被抓去物体的物理效果
-            // this.pointerDragBehavior?.onDragStartObservable.add((event) => {
-            //     this.mesh.physicsImpostor?.sleep();
-            //     console.log("dragStart", event);
-            // })
-            // this.pointerDragBehavior?.onDragObservable.add((event) => {
-            //     console.log("drag", event);
-            // })
-            // this.pointerDragBehavior?.onDragEndObservable.add((event) => {
-            //     this.mesh.physicsImpostor?.wakeUp()
-            //     this.mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
-            //     console.log("dragEnd", event);
-            // })
-        }
-        if (this.isLockedPosition) {
-            this.mesh.addBehavior(this.pointerDragBehavior);
-        } else {
-            this.mesh.removeBehavior(this.pointerDragBehavior)
-        }
     }
 
     useMaterial() {
@@ -93,7 +63,7 @@ class CustomObj {
             this.mesh.physicsImpostor = null
             const framePerSecond = 10
             const second = 1.5 // 动画持续总时间
-            // 位置动画
+            // 位置变化
             const lockPosition = new BABYLON.Animation("lockPosition", "position", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
             lockPosition.setKeys([
                 {frame: 0, value: this.mesh.position},
@@ -112,9 +82,7 @@ class CustomObj {
         } else {
             this.usePhysicsImpostor()
         }
-        this.updateDrag()
     }
 }
-
 
 export default CustomObj
