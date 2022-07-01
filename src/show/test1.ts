@@ -24,7 +24,7 @@ const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, 
 // 创建 场景
 const scene = new BABYLON.Scene(engine);
 {
-    scene.clearColor=new BABYLON.Color4(247/255,207/255,212/255,1)
+    scene.clearColor = new BABYLON.Color4(247 / 255, 207 / 255, 212 / 255, 1)
     // scene.ambientColor = new BABYLON.Color3(0.87, 0.71, 0.73); // 场景环境光。可让材质的环境光有效果
     scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让材质的环境光有效果
     scene.enablePhysics(new BABYLON.Vector3(0, Constant.gravity, 0), new BABYLON.CannonJSPlugin(true, 1, CANNON));
@@ -85,18 +85,18 @@ const shadowGenerator = new BABYLON.ShadowGenerator(1024, light2);
 // shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW
 // shadowGenerator.depthScale=10
 const customObjOptions = [
-    {name: "textBox1", option: {materialOpt: {textureUrl: "/image/sideBlue1.png"}}, initPosition: [0, 16, 0]},
-    {name: "textBox2", option: {materialOpt: {textureUrl: "/image/sideBlue2.png"}}, initPosition: [0, 14, 3]},
-    {name: "textBox3", option: {materialOpt: {textureUrl: "/image/sideBlue3.png"}}, initPosition: [0, 12, 6]},
-    {name: "textBox4", option: {materialOpt: {textureUrl: "/image/sideBlue4.png"}}, initPosition: [0, 10, 7]},
-    {name: "textBox5", option: {materialOpt: {textureUrl: "/image/sideBlue5.png"}}, initPosition: [0, 8, 4]},
-    {name: "textBox6", option: {materialOpt: {textureUrl: "/image/sideBlue6.png"}}, initPosition: [0, 6, 1]},
-    {name: "textBoxOrange1", option: {materialOpt: {textureUrl: "/image/sideOrange1.png"}}, initPosition: [0, 16, 6]},
-    {name: "textBoxOrange2", option: {materialOpt: {textureUrl: "/image/sideOrange2.png"}}, initPosition: [0, 14, 9]},
-    {name: "textBoxOrange3", option: {materialOpt: {textureUrl: "/image/sideOrange3.png"}}, initPosition: [0, 12, 12]},
-    {name: "textBoxOrange4", option: {materialOpt: {textureUrl: "/image/sideOrange4.png"}}, initPosition: [0, 10, 13]},
-    {name: "textBoxOrange5", option: {materialOpt: {textureUrl: "/image/sideOrange5.png"}}, initPosition: [0, 8, 10]},
-    {name: "textBoxOrange6", option: {materialOpt: {textureUrl: "/image/sideOrange6.png"}}, initPosition: [0, 6, 7]},
+    {name: "textBoxBlue1", option: {materialOpt: {textureUrl: "/image/sideBlue1.png"}}, initPosition: [0, 16, -12]},
+    {name: "textBoxBlue2", option: {materialOpt: {textureUrl: "/image/sideBlue2.png"}}, initPosition: [0, 14, -9]},
+    {name: "textBoxBlue3", option: {materialOpt: {textureUrl: "/image/sideBlue3.png"}}, initPosition: [0, 12, -6]},
+    {name: "textBoxBlue4", option: {materialOpt: {textureUrl: "/image/sideBlue4.png"}}, initPosition: [0, 10, -3]},
+    {name: "textBoxBlue5", option: {materialOpt: {textureUrl: "/image/sideBlue5.png"}}, initPosition: [0, 12, 0]},
+    {name: "textBoxBlue6", option: {materialOpt: {textureUrl: "/image/sideBlue6.png"}}, initPosition: [0, 14, 3]},
+    {name: "textBoxOrange1", option: {materialOpt: {textureUrl: "/image/sideOrange1.png"}}, initPosition: [0, 10, 6]},
+    {name: "textBoxOrange2", option: {materialOpt: {textureUrl: "/image/sideOrange2.png"}}, initPosition: [0, 13, 6]},
+    {name: "textBoxOrange3", option: {materialOpt: {textureUrl: "/image/sideOrange3.png"}}, initPosition: [0,16, 6]},
+    {name: "textBoxOrange4", option: {materialOpt: {textureUrl: "/image/sideOrange4.png"}}, initPosition: [0, 19, 9]},
+    {name: "textBoxOrange5", option: {materialOpt: {textureUrl: "/image/sideOrange5.png"}}, initPosition: [0, 16, 9]},
+    {name: "textBoxOrange6", option: {materialOpt: {textureUrl: "/image/sideOrange6.png"}}, initPosition: [0, 13, 9]},
 ]
 const customObjArr: CustomObj[] = []
 setTimeout(() => {

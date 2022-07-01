@@ -15,10 +15,20 @@ class CustomObj {
         this.mesh.isPickable = true
         this.useMaterial()
         this.mesh.scaling = new BABYLON.Vector3(2, 2, 2)
-        BABYLON.Animation.CreateAndStartAnimation('showOn', this.mesh, 'scaling', 60, 10, BABYLON.Vector3.Zero(), new BABYLON.Vector3(1, 1, 1), BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
-        setTimeout(() => {
-            this.usePhysicsImpostor()
-        }, 1200)
+        BABYLON.Animation.CreateAndStartAnimation(
+            'showOn',
+            this.mesh,
+            'scaling',
+            60,
+            10,
+            BABYLON.Vector3.Zero(),
+            new BABYLON.Vector3(1, 1, 1),
+            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+            new BABYLON.CubicEase(),
+            () => {
+                    this.usePhysicsImpostor()
+            }
+        )
         this.updateDrag()
     }
 
