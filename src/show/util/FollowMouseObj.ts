@@ -45,7 +45,7 @@ export default class FollowMouseObj {
                     if (!this.mesh || !this.scene.activeCamera) return;
                     // 调整z值可让方块落在平面的高度
                     // console.log(pointerInfo.event.offsetX,pointerInfo.event.clientX,pointerInfo.event.pageX)
-                    this.mouseVector.set((pointerInfo.event.offsetX) / this.scene.getEngine().getRenderWidth(), (pointerInfo.event.offsetY / this.scene.getEngine().getRenderHeight()), 0.5);
+                    this.mouseVector.set((pointerInfo.event.offsetX) / this.scene.getEngine().getRenderWidth(), (pointerInfo.event.offsetY / this.scene.getEngine().getRenderHeight()), 0);
                     let uvec = BABYLON.Vector3.Unproject(this.mouseVector, 1, 1, BABYLON.Matrix.Identity(), this.scene.activeCamera.getViewMatrix(), this.scene.activeCamera.getProjectionMatrix());
                     const dir = uvec.subtract(this.scene.activeCamera.position).normalize();
                     // 调整此处坐标，可让方块落在垂直于轴的面上

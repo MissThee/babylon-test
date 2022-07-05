@@ -135,7 +135,7 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
         }
     })
 
-// ------------------------固定静态位置------------------------
+    // ------------------------固定静态位置------------------------
     const staticLockPositionInfo: Array<[x: number, y: number, z: number]> = [
         [0, 11, -3], [0, 11, -1], [0, 9, 1], [0, 9, -1], [0, 7, 1], [0, 7, 3],
         [0, 11, -5], [0, 9, -5], [0, 7, -5], [0, 11, 5], [0, 9, 5], [0, 7, 5],
@@ -166,7 +166,7 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
     setTimeout(() => {
         addLockStaticPositionControl()
     }, 3000)
-// ------------------------固定弹力位置------------------------
+    // ------------------------固定弹力位置------------------------
     let stickObjArr: { mainMesh: BABYLON.Mesh, pointMesh: BABYLON.Mesh, joint: BABYLON.PhysicsJoint }[] = []
     const stickPosition = (enable: boolean) => {
         positionLockType = enable ? PositionLockType.Spring : PositionLockType.Spring
@@ -256,7 +256,6 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
         })
     }
 
-
     const addStickPositionControl = () => {
         const inputEl = document.createElement('input')
         inputEl.type = 'button'
@@ -272,7 +271,6 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
     setTimeout(() => {
         addStickPositionControl()
     }, 3000)
-
 
     const addNormalPhysicsControl = () => {
         const inputEl = document.createElement('input')

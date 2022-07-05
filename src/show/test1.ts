@@ -19,8 +19,6 @@ const stats = new Stats();
 document.body.appendChild(stats.dom)
 const canvasEl = document.getElementById('app') as HTMLCanvasElement;
 
-const canMoveCamera = false
-
 let delta = 0
 // 创建 引擎
 const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
@@ -30,11 +28,25 @@ scene.clearColor = new BABYLON.Color4(247 / 255, 207 / 255, 212 / 255, 1)
 scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让材质的环境光有效果
 scene.enablePhysics(new BABYLON.Vector3(0, Constant.gravity, 0), new BABYLON.CannonJSPlugin(true, 1, CANNON));
 // 创建 相机
-const camera = new BABYLON.ArcRotateCamera('ArcRotateCamera', 0, 0.5 * Math.PI, 30, new BABYLON.Vector3(0, 10, 0), scene)
+const camera = new BABYLON.ArcRotateCamera(
+    'ArcRotateCamera',
+    0,
+    0.5 * Math.PI,
+    Constant.sceneDeep / 2 + Constant.cameraDistanceFix + Constant.cameraDistance,
+    new BABYLON.Vector3(
+        0,
+        Constant.cameraDistance * Math.tan(Constant.cameraFov) / 2,
+        0
+    ),
+    scene
+)
+
+camera.fov = Constant.cameraFov
 camera.lowerRadiusLimit = 2
-if (canMoveCamera) {
-    camera.attachControl(canvasEl, false);
+if (Constant.canMoveCamera) {
+    camera.attachControl(canvasEl, false)
 }
+// BABYLON.MeshBuilder.CreateLines('line', {points: [new BABYLON.Vector3(0, 20, 0), new BABYLON.Vector3(0, 20, 20.6)]})
 // 创建 光源
 const light1 = new Light1(scene)
 // new CoordinateLine()
@@ -42,7 +54,11 @@ const light1 = new Light1(scene)
 new ClickSound(scene)
 // SixPicBox(scene)
 // ObjModule(scene)
-new SceneBoard(scene)
+new SceneBoard(scene, {
+    h: Constant.cameraDistance * Math.tan(Constant.cameraFov),
+    v: Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height),
+    d: Constant.sceneDeep
+})
 // 创建 影子生成器
 const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
 // 创建 方块
@@ -60,6 +76,7 @@ const customObjOptions = [
     {name: "textBoxOrange5", option: {materialOpt: {textureUrl: "/image/sideOrange5.png"}}, initPosition: [0, 16, 9]},
     {name: "textBoxOrange6", option: {materialOpt: {textureUrl: "/image/sideOrange6.png"}}, initPosition: [0, 13, 9]},
 ]
+
 const customObjArr: CustomObj[] = []
 setTimeout(() => {
     customObjOptions.forEach((e, index) => {
@@ -76,26 +93,36 @@ setTimeout(() => {
 addBehaviors(scene, customObjArr)
 // ------------------------------------------------------------------------
 // 限制物体位置
+const sceneBoxHeight = Constant.cameraDistance * Math.tan(Constant.cameraFov)
+const sceneBoxWidth = Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height)
+const safePadding = 0.5
 const limitMeshPosition = (mesh: BABYLON.Mesh) => {
-    if (mesh.position.x > 5) {
-        mesh.position.x = 5
+    if (mesh.position.x >= Constant.sceneDeep / 2 - safePadding) {
+        mesh.position.x = Constant.sceneDeep / 2 - safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
-    if (mesh.position.x < -9) {
-        mesh.position.x = -9
+    if (mesh.position.x < -Constant.sceneDeep / 2 + safePadding) {
+        mesh.position.x = -Constant.sceneDeep / 2 + safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
-    if (mesh.position.z < -19) {
-        mesh.position.z = -19
+    if (mesh.position.z > sceneBoxWidth / 2 - safePadding) {
+        mesh.position.z = sceneBoxWidth / 2 - safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
-    if (mesh.position.z > 19) {
-        mesh.position.z = 19
+    if (mesh.position.z < -sceneBoxWidth / 2 + safePadding) {
+        mesh.position.z = -sceneBoxWidth / 2 + safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
-    if (mesh.position.y > 19) {
-        mesh.position.y = 19
+    if (mesh.position.y > sceneBoxHeight - safePadding) {
+        mesh.position.y = sceneBoxHeight - safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
-    if (mesh.position.y < 1) {
-        mesh.position.y = 1
+    if (mesh.position.y < safePadding) {
+        mesh.position.y = safePadding
+        mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
     }
 }
+
 // 减少物体角速度
 const reduceRotateSpeed = (meshArr: BABYLON.Mesh[]) => {
     for (let mesh of meshArr) {

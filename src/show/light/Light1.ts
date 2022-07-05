@@ -10,7 +10,6 @@ export default class Light1 {
         this.light = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
         this.light.intensity = 0.1;
         this.light.position = new BABYLON.Vector3(0, 30, 0);
-        this.light.diffuse = new BABYLON.Color3(1, 1, 1);
     }
 }
 

@@ -2,12 +2,15 @@ import * as BABYLON from "babylonjs";
 
 export default class SceneBoard {
     scene: BABYLON.Scene
+    sideVerticalLength: number = 40
+    sideHorizontalLength: number = 40
+    deepLength: number = 10
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: BABYLON.Scene, size?: { v?: number, h?: number, d?: number }) {
         this.scene = scene
-
-        const sideLength = 40
-        const deepLength = 40
+        this.sideVerticalLength = size?.v || this.sideVerticalLength
+        this.sideHorizontalLength = size?.h || this.sideHorizontalLength
+        this.deepLength = size?.d || this.deepLength
 
         // 场景下部地板
         {
@@ -17,8 +20,8 @@ export default class SceneBoard {
             // groundMaterial.diffuseColor = new BABYLON.Color3(0.87, 0.71, 0.73)
             // groundMaterial.diffuseColor = new BABYLON.Color3(1,1,1)
             let ground = BABYLON.MeshBuilder.CreateGround('ground', {
-                width: deepLength, // x轴方向宽度
-                height: sideLength, // z轴方向宽度
+                width: this.deepLength, // x轴方向宽度
+                height: this.sideVerticalLength, // z轴方向宽度
             })
             // ground.position.y = -5
             ground.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -41,12 +44,12 @@ export default class SceneBoard {
         {
             // 场景右边挡板
             let wallRight = BABYLON.MeshBuilder.CreatePlane('wallRight', {
-                width: deepLength, // x轴方向宽度
-                height: sideLength, // y轴方向宽度
+                width: this.deepLength, // x轴方向宽度
+                height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 0
             })
-            wallRight.position.y = sideLength / 2
-            wallRight.position.z = sideLength / 2
+            wallRight.position.y = this.sideHorizontalLength / 2
+            wallRight.position.z = this.sideVerticalLength / 2
             wallRight.physicsImpostor = new BABYLON.PhysicsImpostor(
                 wallRight, BABYLON.PhysicsImpostor.BoxImpostor,
                 {
@@ -61,12 +64,12 @@ export default class SceneBoard {
         {
             // 场景左边挡板
             let wallLeft = BABYLON.MeshBuilder.CreatePlane('wallLeft', {
-                width: deepLength, // x轴方向宽度
-                height: sideLength, // y轴方向宽度
+                width: this.deepLength, // x轴方向宽度
+                height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 1
             })
-            wallLeft.position.y = sideLength / 2
-            wallLeft.position.z = -sideLength / 2
+            wallLeft.position.y = this.sideHorizontalLength / 2
+            wallLeft.position.z = -this.sideVerticalLength / 2
             wallLeft.physicsImpostor = new BABYLON.PhysicsImpostor(
                 wallLeft, BABYLON.PhysicsImpostor.BoxImpostor,
                 {
@@ -81,12 +84,12 @@ export default class SceneBoard {
         {
             // 场景背部背景板
             let wallBack = BABYLON.MeshBuilder.CreatePlane('wallBack', {
-                width: sideLength, // x轴方向宽度
-                height: sideLength, // y轴方向宽度
+                width: this.sideVerticalLength, // x轴方向宽度
+                height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 1
             })
-            wallBack.position.y = sideLength / 2
-            wallBack.position.x = -deepLength / 2
+            wallBack.position.y = this.sideHorizontalLength / 2
+            wallBack.position.x = -this.deepLength / 2
             wallBack.rotation.y = Math.PI / 2
 
             wallBack.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -101,13 +104,13 @@ export default class SceneBoard {
         }
 
         {
-            // 场景限制物体前后的透明板
+            // 场景限制物体前方透明板
             let wallLimit = BABYLON.MeshBuilder.CreatePlane('wallLimit', {
-                width: sideLength, // x轴方向宽度
-                height: sideLength, // y轴方向宽度
+                width: this.sideVerticalLength, // x轴方向宽度
+                height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 0
             })
-            wallLimit.position.y = sideLength / 2
+            wallLimit.position.y = this.sideHorizontalLength / 2
             wallLimit.rotation.y = Math.PI / 2
 
             wallLimit.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -120,18 +123,17 @@ export default class SceneBoard {
             )
             wallLimit.isVisible = false
 
-            const wallLimitFront = wallLimit
-            wallLimitFront.position.x = 6
-            const wallLimitBack = wallLimit.clone()
-            wallLimitBack.position.x = -10
+            wallLimit.position.x = this.deepLength / 2
+        }
 
+        {
             // 场景限制物体上部的透明板
             let wallLimitTop = BABYLON.MeshBuilder.CreatePlane('wallLimitTop', {
-                width: sideLength, // x轴方向宽度
-                height: sideLength, // y轴方向宽度
-                sideOrientation: 0
+                width: this.deepLength, // x轴方向宽度
+                height: this.sideVerticalLength, // y轴方向宽度
+                sideOrientation: 1
             })
-            wallLimitTop.position.y = 20
+            wallLimitTop.position.y = this.sideHorizontalLength
             wallLimitTop.rotation.x = Math.PI / 2
 
             wallLimitTop.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -142,7 +144,7 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            wallLimitTop.isVisible = false
+            wallLimitTop.material = sideMaterial
         }
     }
 }

@@ -42,7 +42,7 @@ class CustomObj {
     }
 
     usePhysicsImpostor() {
-        if (this.mesh.physicsImpostor) {
+        if (this.mesh.physicsImpostor && !this.mesh.physicsImpostor.isDisposed) {
             return
         }
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
@@ -60,7 +60,6 @@ class CustomObj {
         if (this.isLockedPosition) {
             // 绑定物理效果后不能执行动画，需要先清除物理效果
             this.mesh.physicsImpostor?.dispose()
-            this.mesh.physicsImpostor = null
             const framePerSecond = 10
             const second = 1.5 // 动画持续总时间
             // 位置变化
