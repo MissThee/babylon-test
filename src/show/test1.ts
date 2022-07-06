@@ -14,6 +14,7 @@ import SceneBoard from './object/SceneBoard'
 import CustomObj from './object/CustomObj'
 import Light1 from "./light/Light1";
 import addBehaviors from "./util/addBehaviors";
+import ParticleFlare from "./object/ParticleFlare";
 
 const stats = new Stats();
 document.body.appendChild(stats.dom)
@@ -54,6 +55,7 @@ const light1 = new Light1(scene)
 new ClickSound(scene)
 // SixPicBox(scene)
 // ObjModule(scene)
+const particleFlare= new ParticleFlare(scene)
 new SceneBoard(scene, {
     h: Constant.cameraDistance * Math.tan(Constant.cameraFov),
     v: Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height),
@@ -90,7 +92,9 @@ setTimeout(() => {
 }, 500)
 
 // 创建 可交互对象，添加交互动作
-addBehaviors(scene, customObjArr)
+addBehaviors(scene, customObjArr,particleFlare)
+// 创建 粒子点击交互动作
+
 // ------------------------------------------------------------------------
 // 限制物体位置
 const sceneBoxHeight = Constant.cameraDistance * Math.tan(Constant.cameraFov)

@@ -2,8 +2,9 @@ import FollowMouseObj from "./FollowMouseObj";
 import * as  BABYLON from "babylonjs";
 import * as Constant from "./Constant";
 import CustomObj from '../object/CustomObj'
+import ParticleFlare from "../object/ParticleFlare";
 
-export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
+export default (scene: BABYLON.Scene, customObjArr: CustomObj[], particleFlare: ParticleFlare) => {
     // 拖动基础变量
     enum PositionLockType {
         None,
@@ -99,6 +100,10 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
                     );
                     if (pickingInfo?.pickedMesh && pickingInfo.ray && pickingInfo?.pickedPoint && scene.activeCamera) {
                         pickingInfo.pickedMesh.physicsImpostor?.applyImpulse(pickingInfo.ray.origin.normalize().scale(-15), pickingInfo.pickedPoint)
+                        particleFlare.particleSystem.emitter =followMouseObj.mesh.position.clone().add(
+                                scene.activeCamera.position.subtract(pickingInfo.pickedPoint).normalize().scale(Constant.sceneDeep / 2)
+                            )
+                        particleFlare.particleSystem.start()
                     }
                 }
                 break
