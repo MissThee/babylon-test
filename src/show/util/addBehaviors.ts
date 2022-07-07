@@ -46,6 +46,7 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[], particleFlare: 
                         currentFollowJoint = new BABYLON.PhysicsJoint(
                             BABYLON.PhysicsJoint.SpringJoint,
                             {
+                                // @ts-ignore
                                 length: 0,
                                 stiffness: -Constant.gravity * 3,
                                 damping: -Constant.gravity,
@@ -228,6 +229,7 @@ export default (scene: BABYLON.Scene, customObjArr: CustomObj[], particleFlare: 
                 const physicsJoint = new BABYLON.PhysicsJoint(
                     BABYLON.PhysicsJoint.SpringJoint,
                     {
+                        // @ts-ignore
                         length: 0,
                         stiffness: 4,
                         damping: 3,
