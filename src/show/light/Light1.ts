@@ -1,5 +1,4 @@
-import * as BABYLON from "babylonjs";
-
+import * as BABYLON from '@babylonjs/core';
 
 export default class Light1 {
     scene: BABYLON.Scene;

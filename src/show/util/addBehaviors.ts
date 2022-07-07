@@ -1,5 +1,6 @@
+import * as BABYLON from '@babylonjs/core';
+
 import FollowMouseObj from "./FollowMouseObj";
-import * as  BABYLON from "babylonjs";
 import * as Constant from "./Constant";
 import CustomObj from '../object/CustomObj'
 import ParticleFlare from "../object/ParticleFlare";

@@ -1,4 +1,4 @@
-import * as BABYLON from "babylonjs";
+import * as BABYLON from '@babylonjs/core';
 
 export const baseLineDataArr = [
     {start: [0, 0, 0], end: [10, 0, 0], color: [255, 0, 0, 1]},

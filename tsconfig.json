@@ -17,9 +17,9 @@
     "skipLibCheck": true
   },
   "types": [
-    "babylonjs",
-    "babylonjs-gui",
-    "babylonjs-materials"
+//    "babylonjs",
+//    "babylonjs-gui",
+//    "babylonjs-materials"
   ],
   "include": ["src"]
 }

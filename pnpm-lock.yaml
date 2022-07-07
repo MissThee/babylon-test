@@ -1,30 +1,32 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@babylonjs/core': ^5.13.2
+  '@babylonjs/loaders': ^5.13.3
   '@types/cannon': ^0.1.8
   '@types/stats.js': ^0.17.0
   '@vitejs/plugin-legacy': ^1.8.2
-  babylonjs: 5.11.0
-  babylonjs-loaders: 5.11.0
+  babylonjs-gltf2interface: ^5.13.2
   cannon: ^0.6.2
   stats.js: ^0.17.0
   terser: ^5.14.1
   typescript: ^4.5.4
-  vite: ^2.9.9
+  vite: 2.9.13
 
 dependencies:
-  babylonjs: 5.11.0
-  babylonjs-loaders: 5.11.0
+  '@babylonjs/core': 5.13.2
+  '@babylonjs/loaders': 5.13.3_ar3lik4oa5zxo4bintowpcy44i
   cannon: 0.6.2
   stats.js: 0.17.0
 
 devDependencies:
   '@types/cannon': 0.1.8
   '@types/stats.js': 0.17.0
-  '@vitejs/plugin-legacy': 1.8.2_vite@2.9.12
+  '@vitejs/plugin-legacy': 1.8.2_vite@2.9.13
+  babylonjs-gltf2interface: 5.13.2
   terser: 5.14.1
   typescript: 4.7.3
-  vite: 2.9.12
+  vite: 2.9.13
 
 packages:
 
@@ -32,6 +34,23 @@ packages:
     resolution: {integrity: sha512-AIOn3ON0KhYqAbvmkT11vi/YAlhrPn6RSPQb8Hl3PUZoE1yFwut5fQ9/oJ4Dvf2SGmO41pF7xmwP2W1RT0uJCA==}
     engines: {node: '>=6.9.0'}
     dev: true
+
+  /@babylonjs/core/5.13.2:
+    resolution: {integrity: sha512-aemACYnvQS4IVFMDYh6DeZ/seSj6S441HYbUykeXWjLcn7iVJtkQ3f0iqaY4bjFGmk3Fx9hzcaVVQZc/7MfGQw==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
+
+  /@babylonjs/loaders/5.13.3_ar3lik4oa5zxo4bintowpcy44i:
+    resolution: {integrity: sha512-tbCvW7n9tJZxMN8IGN7u7C+L7W6BM4SNFyOVHuVELVzoOHGtKF75qb4yvxViJgrrRleDUq36m2960O0iDolgJg==}
+    peerDependencies:
+      '@babylonjs/core': ^5.0.0
+      babylonjs-gltf2interface: ^5.0.0
+    dependencies:
+      '@babylonjs/core': 5.13.2
+      babylonjs-gltf2interface: 5.13.2
+      tslib: 2.4.0
+    dev: false
 
   /@jridgewell/gen-mapping/0.3.2:
     resolution: {integrity: sha512-mh65xKQAzI6iBcFzwv28KVWSmCkdRBWoOh+bYQGW3+6OZvbbN3TqMGo5hqYxQniRcH9F2VZIoJCm4pa3BPDK/A==}
@@ -78,7 +97,7 @@ packages:
     resolution: {integrity: sha512-9w+a7bR8PeB0dCT/HBULU2fMqf6BAzvKbxFboYhmDtDkKPiyXYbjoe2auwsXlEFI7CFNMF1dCv3dFH5Poy9R1w==}
     dev: true
 
-  /@vitejs/plugin-legacy/1.8.2_vite@2.9.12:
+  /@vitejs/plugin-legacy/1.8.2_vite@2.9.13:
     resolution: {integrity: sha512-NCOKU+pU+cxLMR9P9RTolEuOK+h+zYBXlknj+zGcKSj/NXBZYgA1GAH1FnO4zijoWRiTaiOm2ha9LQrELE7XHg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -89,7 +108,7 @@ packages:
       magic-string: 0.26.2
       regenerator-runtime: 0.13.9
       systemjs: 6.12.1
-      vite: 2.9.12
+      vite: 2.9.13
     dev: true
 
   /acorn/8.7.1:
@@ -98,21 +117,8 @@ packages:
     hasBin: true
     dev: true
 
-  /babylonjs-gltf2interface/5.11.0:
-    resolution: {integrity: sha512-4QjedsTMG8mztwfGimDmtrlwQGZCmmkWXmENL5qAQoAg6eAp1oWtWWmTkhH0VS+XFF4UBnDQeC4R+zzFa+ltlQ==}
-    dev: false
-
-  /babylonjs-loaders/5.11.0:
-    resolution: {integrity: sha512-16LnAyBbekVVD6ZxmUj6wxgpzRAC2iH2XX3om/GOv/7i2TG1d2k6rBa+nQpap4NAX+syOLavcHTx8WMCrD9KJw==}
-    dependencies:
-      babylonjs: 5.11.0
-      babylonjs-gltf2interface: 5.11.0
-    dev: false
-
-  /babylonjs/5.11.0:
-    resolution: {integrity: sha512-yoCREGy0wAMFjs/XIvtu6az7uE8B/22G0DNm5lC1wwjKLW1EPSvnZks0v+oqc1LZXVNcGWN3xVRhiaX3v+9lGA==}
-    requiresBuild: true
-    dev: false
+  /babylonjs-gltf2interface/5.13.2:
+    resolution: {integrity: sha512-BKDMo8+y6uOqJxSuBqpq6D8U/Pm6psk6EwI2O/XnSrQn0fX3ThNn3NEV2iahoYFyJEcESGf1m8v3Uds32ZvHvw==}
 
   /buffer-from/1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -460,14 +466,18 @@ packages:
       source-map-support: 0.5.21
     dev: true
 
+  /tslib/2.4.0:
+    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+    dev: false
+
   /typescript/4.7.3:
     resolution: {integrity: sha512-WOkT3XYvrpXx4vMMqlD+8R8R37fZkjyLGlxavMc4iB8lrl8L0DeTcHbYgw/v0N/z9wAFsgBhcsF0ruoySS22mA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
 
-  /vite/2.9.12:
-    resolution: {integrity: sha512-suxC36dQo9Rq1qMB2qiRorNJtJAdxguu5TMvBHOc/F370KvqAe9t48vYp+/TbPKRNrMh/J55tOUmkuIqstZaew==}
+  /vite/2.9.13:
+    resolution: {integrity: sha512-AsOBAaT0AD7Mhe8DuK+/kE4aWYFMx/i0ZNi98hJclxb4e0OhQcZYUrvLjIaQ8e59Ui7txcvKMiJC1yftqpQoDw==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:

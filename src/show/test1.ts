@@ -1,5 +1,7 @@
-import * as BABYLON from 'babylonjs';
-// import "babylonjs-loaders";
+import * as BABYLON from '@babylonjs/core';
+// import {Engine, Scene, Color4, Color3, CannonJSPlugin, Vector3, ShadowGenerator, ArcRotateCamera, Mesh} from '@babylonjs/core';
+// const BABYLON = {Engine, Scene, Color4, Color3, CannonJSPlugin, Vector3, ShadowGenerator, ArcRotateCamera}
+// import "@babylonjs/loaders";
 
 import CoordinateLine from "./util/CoordinateLine";
 import SixPicBox from "./object/SixPicBox";
@@ -55,7 +57,7 @@ const light1 = new Light1(scene)
 new ClickSound(scene)
 // SixPicBox(scene)
 // ObjModule(scene)
-const particleFlare= new ParticleFlare(scene)
+const particleFlare = new ParticleFlare(scene)
 new SceneBoard(scene, {
     h: Constant.cameraDistance * Math.tan(Constant.cameraFov),
     v: Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height),
@@ -92,7 +94,7 @@ setTimeout(() => {
 }, 500)
 
 // 创建 可交互对象，添加交互动作
-addBehaviors(scene, customObjArr,particleFlare)
+addBehaviors(scene, customObjArr, particleFlare)
 // 创建 粒子点击交互动作
 
 // ------------------------------------------------------------------------
@@ -128,7 +130,7 @@ const limitMeshPosition = (mesh: BABYLON.Mesh) => {
 }
 
 // 减少物体角速度
-const reduceRotateSpeed = (meshArr: BABYLON.Mesh[]) => {
+const reduceRotateSpeed = (meshArr:BABYLON.Mesh[]) => {
     for (let mesh of meshArr) {
         const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
         if (angularVelocity && !angularVelocity?.equals(BABYLON.Vector3.Zero())) {

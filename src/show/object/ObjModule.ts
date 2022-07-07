@@ -1,7 +1,7 @@
 // 加载 模型
 // BABYLON.SceneLoader.AppendAsync("/module/", "emerald.obj",scene).then(s=>{console.log(s)})
 // 加载 模型
-import * as BABYLON from "babylonjs";
+import * as BABYLON from '@babylonjs/core';
 
 export default (scene?: BABYLON.Scene) => {
     const assetsManager = new BABYLON.AssetsManager();
