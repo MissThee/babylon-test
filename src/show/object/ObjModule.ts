@@ -1,9 +1,18 @@
 // 加载 模型
 // BABYLON.SceneLoader.AppendAsync("/module/", "emerald.obj",scene).then(s=>{console.log(s)})
 // 加载 模型
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
 
-export default (scene?: BABYLON.Scene) => {
+import type {Scene} from "@babylonjs/core/scene";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {Color3} from "@babylonjs/core/Maths/math.color";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
+import {AssetsManager} from '@babylonjs/core/Misc/assetsManager'
+
+const BABYLON = {Color3, Vector3, StandardMaterial, PhysicsImpostor, AssetsManager}
+
+export default (scene?: Scene) => {
     const assetsManager = new BABYLON.AssetsManager();
     const meshTask1 = assetsManager.addMeshTask("customModule", "", "/module/", "bunny.obj")
     meshTask1.onSuccess = (t: { loadedMeshes: any[]; }) => {
@@ -17,46 +26,11 @@ export default (scene?: BABYLON.Scene) => {
             mat.emissiveColor = BABYLON.Color3.Blue()
             mesh.material = mat
 
-            mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.MeshImpostor, {mass: 0, friction:1, restitution: 0},scene);
+            mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.MeshImpostor, {mass: 0, friction: 1, restitution: 0}, scene);
 
         });
     };
     assetsManager.load()
     return assetsManager
-
-
-    //
-    // BABYLON.SceneLoader.ImportMesh("", "module/", "skull.babylon", scene, function (newMeshes) {
-    //     // Set the target of the camera to the first imported mesh
-    //
-    //     let skull = newMeshes[0];
-    //
-    //     skull.physicsImpostor = new BABYLON.PhysicsImpostor(skull, BABYLON.PhysicsImpostor.MeshImpostor, {mass: 0, friction: 0, restitution: 0.3});
-    //
-    //     var ticker = 0;
-    //
-    //     let spheres = [];
-    //
-    //     scene.registerBeforeRender(function() {
-    //         if(ticker++ % 60) return;
-    //
-    //         let s = BABYLON.MeshBuilder.CreateSphere("s", {diameter: 5});
-    //         s.position.y = 100;
-    //         s.position.z = 65 + Math.random() * 20;
-    //         s.position.x = -10 + Math.random() * 20;
-    //
-    //         s.physicsImpostor = new BABYLON.PhysicsImpostor(s, BABYLON.PhysicsImpostor.SphereImpostor, {mass: 1});
-    //         spheres.push(s);
-    //
-    //         spheres.forEach(function(sphere) {
-    //             if(sphere.position.y < 0) {
-    //                 sphere.dispose();
-    //             }
-    //         });
-    //
-    //         spheres = spheres.filter(s => !s.isDisposed());
-    //
-    //     });
-    // });
 
 }

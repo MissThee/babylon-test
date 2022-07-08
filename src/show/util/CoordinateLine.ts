@@ -1,4 +1,12 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import type {Mesh} from "@babylonjs/core/Meshes/mesh";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {Color4} from "@babylonjs/core/Maths/math.color";
+import {CreateLines} from '@babylonjs/core/Meshes/Builders/linesBuilder'
+
+const BABYLON = {Color4, Vector3, CreateLines}
 
 export const baseLineDataArr = [
     {start: [0, 0, 0], end: [10, 0, 0], color: [255, 0, 0, 1]},
@@ -7,10 +15,10 @@ export const baseLineDataArr = [
 ]
 
 export default class CoordinateLine {
-    scene: BABYLON.Scene;
-    lines: BABYLON.Mesh[] = [];
+    scene: Scene;
+    lines: Mesh[] = [];
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         this.scene = scene
         baseLineDataArr.forEach(lineData => {
             this.lines.push(BABYLON.CreateLines('coordinateLine',

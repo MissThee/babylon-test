@@ -1,21 +1,34 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import type {Mesh} from "@babylonjs/core/Meshes/mesh";
+import {Vector3, Matrix} from "@babylonjs/core/Maths/math.vector";
+import {Color3} from "@babylonjs/core/Maths/math.color";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
+import {PointerEventTypes} from "@babylonjs/core/Events/pointerEvents";
+
+import {CreateSphere} from '@babylonjs/core/Meshes/Builders/sphereBuilder'
+
+const MeshBuilder = {CreateSphere}
+const BABYLON = {Color3, Vector3, StandardMaterial, MeshBuilder, PhysicsImpostor, PointerEventTypes, Matrix}
 
 let instance: FollowMouseObj;
 
 export default class FollowMouseObj {
-    scene: BABYLON.Scene;
-    mesh: BABYLON.Mesh;
-    material?: BABYLON.StandardMaterial
+    scene: Scene;
+    mesh: Mesh;
+    material?: StandardMaterial
     mouseVector = new BABYLON.Vector3;
 
-    static getInstance(scene: BABYLON.Scene) {
+    static getInstance(scene: Scene) {
         if (!instance) {
             instance = new FollowMouseObj(scene)
         }
         return instance
     }
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {segments: 1}, this.scene)
         this.mesh.isPickable = false

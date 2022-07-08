@@ -1,14 +1,21 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {PointerEventTypes} from '@babylonjs/core/Events/pointerEvents'
+
+import {Sound} from '@babylonjs/core/Audio/sound'
+import '@babylonjs/core/Audio/audioSceneComponent'
+const BABYLON = {StandardMaterial, Sound, PointerEventTypes}
 
 let instance: ClickSound;
 
 export default class ClickSound {
-    scene: BABYLON.Scene | undefined
-    soundBounceArr: BABYLON.Sound[] = []
-    soundBounceFilePathArr = ["/sound/bounce1.mp3", "/sound/bounce2.mp3", "/sound/bounce3.mp3"]
+    scene: Scene | undefined
+    soundBounceArr: Sound[] = []
+    soundBounceFilePathArr = ["sound/bounce1.mp3", "sound/bounce2.mp3", "sound/bounce3.mp3"]
 
-
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         if (instance) {
             return instance
         }

@@ -1,11 +1,22 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import type {Mesh} from "@babylonjs/core/Meshes/mesh";
+import {Vector4} from "@babylonjs/core/Maths/math.vector";
+import {Color3} from "@babylonjs/core/Maths/math.color";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {Texture} from '@babylonjs/core/Materials/Textures/texture'
+import {CreateBox} from '@babylonjs/core/Meshes/Builders/boxBuilder'
+
+const MeshBuilder = {CreateBox}
+const BABYLON = {Color3, Vector4, StandardMaterial, MeshBuilder, Texture}
 
 export default class SixPicBox {
-    scene: BABYLON.Scene
-    mesh: BABYLON.Mesh
-    material: BABYLON.StandardMaterial
+    scene: Scene
+    mesh: Mesh
+    material: StandardMaterial
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         this.scene = scene
         this.material = new BABYLON.StandardMaterial("boxMaterial");
         this.material.diffuseTexture = new BABYLON.Texture("/image/box.png");

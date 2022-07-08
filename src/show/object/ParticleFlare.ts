@@ -1,9 +1,16 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+import type {Scene} from "@babylonjs/core/scene";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {Color4 } from "@babylonjs/core/Maths/math.color";
+import {Texture} from '@babylonjs/core/Materials/Textures/texture'
+import {ParticleSystem} from '@babylonjs/core/Particles/particleSystem'
+
+const BABYLON = {Vector3, Texture, ParticleSystem, Color4}
 
 class ParticleFlare {
-    particleSystem: BABYLON.ParticleSystem
+    particleSystem: ParticleSystem
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         this.particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
         this.particleSystem.particleTexture = new BABYLON.Texture("image/star.png");
         this.particleSystem.createPointEmitter(new BABYLON.Vector3(5, -5, 5), new BABYLON.Vector3(5, 5, -5));
@@ -51,9 +58,9 @@ class ParticleFlare {
         this.particleSystem.minEmitPower = 2;
         this.particleSystem.maxEmitPower = 2;
         this.particleSystem.updateSpeed = 0.01;
-        this.particleSystem.addVelocityGradient(0,2)
-        this.particleSystem.addVelocityGradient(0.5,0.5)
-        this.particleSystem.addVelocityGradient(1,0)
+        this.particleSystem.addVelocityGradient(0, 2)
+        this.particleSystem.addVelocityGradient(0.5, 0.5)
+        this.particleSystem.addVelocityGradient(1, 0)
         //
         // // 粒子运动噪音
         // const noiseTexture = new BABYLON.NoiseProceduralTexture("perlin", 256, scene);

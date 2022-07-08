@@ -1,12 +1,22 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import {Color3} from "@babylonjs/core/Maths/math.color";
+import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
+import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
+import {CreateGround} from '@babylonjs/core/Meshes/Builders/groundBuilder'
+import {CreatePlane} from '@babylonjs/core/Meshes/Builders/planeBuilder'
+
+const MeshBuilder = {CreateGround, CreatePlane}
+const BABYLON = {Color3, StandardMaterial, MeshBuilder, PhysicsImpostor}
 
 export default class SceneBoard {
-    scene: BABYLON.Scene
+    scene: Scene
     sideVerticalLength: number = 40
     sideHorizontalLength: number = 40
     deepLength: number = 10
 
-    constructor(scene: BABYLON.Scene, size?: { v?: number, h?: number, d?: number }) {
+    constructor(scene: Scene, size?: { v?: number, h?: number, d?: number }) {
         this.scene = scene
         this.sideVerticalLength = size?.v || this.sideVerticalLength
         this.sideHorizontalLength = size?.h || this.sideHorizontalLength

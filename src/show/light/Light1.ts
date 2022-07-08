@@ -1,10 +1,16 @@
-import * as BABYLON from '@babylonjs/core';
+// import * as BABYLON from '@babylonjs/core';
+
+import type {Scene} from "@babylonjs/core/scene";
+import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {DirectionalLight} from "@babylonjs/core/Lights/directionalLight";
+
+const BABYLON = {Vector3, DirectionalLight}
 
 export default class Light1 {
-    scene: BABYLON.Scene;
-    light: BABYLON.DirectionalLight;
+    scene: Scene;
+    light: DirectionalLight;
 
-    constructor(scene: BABYLON.Scene) {
+    constructor(scene: Scene) {
         this.scene = scene
         this.light = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
         this.light.intensity = 0.1;
