@@ -1,6 +1,8 @@
 import type CustomObj from './object/CustomObj'
 import type {Mesh} from "@babylonjs/core/Meshes/mesh";
 import * as Constant from './util/Constant'
+import * as AssetsImage from '../../src/assets/image'
+import '@babylonjs/core/Audio/audioSceneComponent'
 
 // import * as BABYLON from '@babylonjs/core';
 // import "@babylonjs/loaders";
@@ -8,22 +10,20 @@ import * as Constant from './util/Constant'
 // import CoordinateLine from "./util/CoordinateLine";
 // import SixPicBox from "./object/SixPicBox";
 // import ObjModule from "./object/ObjModule";
-
-
 // 方块配置
 const customObjOptions = [
-    {name: "textBoxBlue1", option: {materialOpt: {textureUrl: "image/sideBlue1.png"}}, initPosition: [0, 16, -12]},
-    {name: "textBoxBlue2", option: {materialOpt: {textureUrl: "image/sideBlue2.png"}}, initPosition: [0, 14, -9]},
-    {name: "textBoxBlue3", option: {materialOpt: {textureUrl: "image/sideBlue3.png"}}, initPosition: [0, 12, -6]},
-    {name: "textBoxBlue4", option: {materialOpt: {textureUrl: "image/sideBlue4.png"}}, initPosition: [0, 10, -3]},
-    {name: "textBoxBlue5", option: {materialOpt: {textureUrl: "image/sideBlue5.png"}}, initPosition: [0, 12, 0]},
-    {name: "textBoxBlue6", option: {materialOpt: {textureUrl: "image/sideBlue6.png"}}, initPosition: [0, 14, 3]},
-    {name: "textBoxOrange1", option: {materialOpt: {textureUrl: "image/sideOrange1.png"}}, initPosition: [0, 10, 6]},
-    {name: "textBoxOrange2", option: {materialOpt: {textureUrl: "image/sideOrange2.png"}}, initPosition: [0, 13, 6]},
-    {name: "textBoxOrange3", option: {materialOpt: {textureUrl: "image/sideOrange3.png"}}, initPosition: [0, 16, 6]},
-    {name: "textBoxOrange4", option: {materialOpt: {textureUrl: "image/sideOrange4.png"}}, initPosition: [0, 19, 9]},
-    {name: "textBoxOrange5", option: {materialOpt: {textureUrl: "image/sideOrange5.png"}}, initPosition: [0, 16, 9]},
-    {name: "textBoxOrange6", option: {materialOpt: {textureUrl: "image/sideOrange6.png"}}, initPosition: [0, 13, 9]},
+    {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 16, -12]},
+    {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 14, -9]},
+    {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 12, -6]},
+    {name: "textBoxBlue4", option: {materialOpt: {textureUrl: AssetsImage.sideBlue4}}, initPosition: [0, 10, -3]},
+    {name: "textBoxBlue5", option: {materialOpt: {textureUrl: AssetsImage.sideBlue5}}, initPosition: [0, 12, 0]},
+    {name: "textBoxBlue6", option: {materialOpt: {textureUrl: AssetsImage.sideBlue6}}, initPosition: [0, 14, 3]},
+    {name: "textBoxOrange1", option: {materialOpt: {textureUrl: AssetsImage.sideOrange1}}, initPosition: [0, 10, 6]},
+    {name: "textBoxOrange2", option: {materialOpt: {textureUrl: AssetsImage.sideOrange2}}, initPosition: [0, 13, 6]},
+    {name: "textBoxOrange3", option: {materialOpt: {textureUrl: AssetsImage.sideOrange3}}, initPosition: [0, 16, 6]},
+    {name: "textBoxOrange4", option: {materialOpt: {textureUrl: AssetsImage.sideOrange4}}, initPosition: [0, 19, 9]},
+    {name: "textBoxOrange5", option: {materialOpt: {textureUrl: AssetsImage.sideOrange5}}, initPosition: [0, 16, 9]},
+    {name: "textBoxOrange6", option: {materialOpt: {textureUrl: AssetsImage.sideOrange6}}, initPosition: [0, 13, 9]},
 ]
 
 export default async () => {

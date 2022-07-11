@@ -3,9 +3,8 @@
 import type {Scene} from "@babylonjs/core/scene";
 import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
 import {PointerEventTypes} from '@babylonjs/core/Events/pointerEvents'
-
+import * as AssetsSound from '../../../src/assets/sound'
 import {Sound} from '@babylonjs/core/Audio/sound'
-import '@babylonjs/core/Audio/audioSceneComponent'
 const BABYLON = {StandardMaterial, Sound, PointerEventTypes}
 
 let instance: ClickSound;
@@ -13,7 +12,11 @@ let instance: ClickSound;
 export default class ClickSound {
     scene: Scene | undefined
     soundBounceArr: Sound[] = []
-    soundBounceFilePathArr = ["sound/bounce1.mp3", "sound/bounce2.mp3", "sound/bounce3.mp3"]
+    soundBounceFilePathArr = [
+        AssetsSound.bounce1,
+        AssetsSound.bounce2,
+        AssetsSound.bounce3
+    ]
 
     constructor(scene: Scene) {
         if (instance) {

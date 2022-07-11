@@ -11,6 +11,8 @@ import {CreateBox} from '@babylonjs/core/Meshes/Builders/boxBuilder'
 const MeshBuilder = {CreateBox}
 const BABYLON = {Color3, Vector4, StandardMaterial, MeshBuilder, Texture}
 
+import * as Image from '../../../src/assets/image/index'
+
 export default class SixPicBox {
     scene: Scene
     mesh: Mesh
@@ -19,7 +21,7 @@ export default class SixPicBox {
     constructor(scene: Scene) {
         this.scene = scene
         this.material = new BABYLON.StandardMaterial("boxMaterial");
-        this.material.diffuseTexture = new BABYLON.Texture("/image/box.png");
+        this.material.diffuseTexture = new BABYLON.Texture(Image.box);
         this.material.emissiveColor = new BABYLON.Color3(1, 1, 1); // 自发光颜色
 
         this.mesh = BABYLON.MeshBuilder.CreateBox('SixPicBox', {

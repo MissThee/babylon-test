@@ -49,11 +49,13 @@ class CustomObj {
         if (this.mesh.material) {
             return
         }
-        this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
-        this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl || "image/testMaterial.png");
-        this.material.emissiveColor = new BABYLON.Color3(1, 1, 1)
-        this.material.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05)
-        this.mesh.material = this.material;
+        if (this.options?.materialOpt?.textureUrl) {
+            this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
+            this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
+            this.material.emissiveColor = new BABYLON.Color3(1, 1, 1)
+            this.material.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05)
+            this.mesh.material = this.material;
+        }
     }
 
     usePhysicsImpostor() {

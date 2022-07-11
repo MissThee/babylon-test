@@ -1,9 +1,10 @@
 // import * as BABYLON from '@babylonjs/core';
 import type {Scene} from "@babylonjs/core/scene";
 import {Vector3} from "@babylonjs/core/Maths/math.vector";
-import {Color4 } from "@babylonjs/core/Maths/math.color";
+import {Color4} from "@babylonjs/core/Maths/math.color";
 import {Texture} from '@babylonjs/core/Materials/Textures/texture'
 import {ParticleSystem} from '@babylonjs/core/Particles/particleSystem'
+import * as AssetsImage from '../../../src/assets/image'
 
 const BABYLON = {Vector3, Texture, ParticleSystem, Color4}
 
@@ -12,7 +13,7 @@ class ParticleFlare {
 
     constructor(scene: Scene) {
         this.particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
-        this.particleSystem.particleTexture = new BABYLON.Texture("image/star.png");
+        this.particleSystem.particleTexture = new BABYLON.Texture(AssetsImage.star);
         this.particleSystem.createPointEmitter(new BABYLON.Vector3(5, -5, 5), new BABYLON.Vector3(5, 5, -5));
         // 起始发射位置
         // this.particleSystem.emitter = new BABYLON.Vector3(0, 5, 0);
