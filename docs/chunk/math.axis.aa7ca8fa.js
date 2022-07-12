@@ -1,1 +1,0 @@
-import{V as L}from"./test1.990751a6.js";var O;(function(n){n[n.LOCAL=0]="LOCAL",n[n.WORLD=1]="WORLD",n[n.BONE=2]="BONE"})(O||(O={}));var s=function(){function n(){}return n.X=new L(1,0,0),n.Y=new L(0,1,0),n.Z=new L(0,0,1),n}(),f;(function(n){n[n.X=0]="X",n[n.Y=1]="Y",n[n.Z=2]="Z"})(f||(f={}));export{s as A,O as S};

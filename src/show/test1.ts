@@ -2,7 +2,6 @@ import type CustomObj from './object/CustomObj'
 import type {Mesh} from "@babylonjs/core/Meshes/mesh";
 import * as Constant from './util/Constant'
 import * as AssetsImage from '../../src/assets/image'
-import '@babylonjs/core/Audio/audioSceneComponent'
 
 // import * as BABYLON from '@babylonjs/core';
 // import "@babylonjs/loaders";
@@ -27,10 +26,12 @@ const customObjOptions = [
 ]
 
 export default async () => {
+
     const canvasEl = document.getElementById('app') as HTMLCanvasElement;
 
     // 创建 引擎
     const {Engine} = await import("@babylonjs/core/Engines/engine")
+    await import ('@babylonjs/core/Audio/audioSceneComponent')// 引入声音插件
     const engine = new Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
     // 创建 场景
     const {Scene} = await import("@babylonjs/core/scene")
