@@ -28,21 +28,40 @@ class CustomObj {
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
         this.mesh.isPickable = true
         this.useMaterial()
-        this.mesh.scaling = new BABYLON.Vector3(2, 2, 2)
-        BABYLON.Animation.CreateAndStartAnimation(
-            'showOn',
-            this.mesh,
-            'scaling',
-            60,
-            10,
-            BABYLON.Vector3.Zero(),
-            new BABYLON.Vector3(1, 1, 1),
-            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
-            new BABYLON.CubicEase(),
-            () => {
-                this.usePhysicsImpostor()
-            }
-        )
+        this.initAnimation()
+        this.mesh.scaling = BABYLON.Vector3.Zero()
+    }
+
+    initAnimation() {
+        let animation = new BABYLON.Animation('showOn', 'scaling', 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
+        animation.setKeys([
+            {frame: 0, value: BABYLON.Vector3.Zero()},
+            {frame: 10, value: new BABYLON.Vector3(1, 1, 1)},
+        ])
+        this.mesh.animations.push(animation)
+    }
+
+    show() {
+        // return new Promise<void>((resolve) => {
+        //     BABYLON.Animation.CreateAndStartAnimation(
+        //         'showOn',
+        //         this.mesh,
+        //         'scaling',
+        //         60,
+        //         10,
+        //         BABYLON.Vector3.Zero(),
+        //         new BABYLON.Vector3(1, 1, 1),
+        //         BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        //         new BABYLON.CubicEase(),
+        //         () => {
+        //             this.usePhysicsImpostor()
+        //             resolve()
+        //         }
+        //     )
+        // })
+        return new Promise<void>((resolve) => {
+            this.scene.beginAnimation(this.mesh, 0, 10, false, 1, resolve)
+        })
     }
 
     useMaterial() {

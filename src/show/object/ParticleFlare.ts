@@ -22,7 +22,7 @@ class ParticleFlare {
         // this.particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0); // To...
         //
         // // 粒子颜色
-        this.particleSystem.color1 = new BABYLON.Color4(1, 1, 1, 1);
+        this.particleSystem.color1 = new BABYLON.Color4(1, 0, 0, 1);
         this.particleSystem.color2 = new BABYLON.Color4(1.5, 1.5, 1.5, 1);
         this.particleSystem.colorDead = new BABYLON.Color4(1.5, 1.5, 1.5, 0.2);
         //

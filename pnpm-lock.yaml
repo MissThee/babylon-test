@@ -1,8 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@babylonjs/core': ^5.13.2
-  '@babylonjs/loaders': ^5.13.3
+  '@babylonjs/core': ^5.18.0
+  '@babylonjs/loaders': ^5.18.0
   '@types/cannon': ^0.1.8
   '@types/stats.js': ^0.17.0
   '@vitejs/plugin-legacy': ^1.8.2
@@ -15,8 +15,8 @@ specifiers:
   vite: ^2.9.13
 
 dependencies:
-  '@babylonjs/core': 5.13.2
-  '@babylonjs/loaders': 5.13.3_ar3lik4oa5zxo4bintowpcy44i
+  '@babylonjs/core': 5.18.0
+  '@babylonjs/loaders': 5.18.0_f5tregzyq2zonelajthv57vyze
   cannon: 0.6.2
   express: 4.18.1
   stats.js: 0.17.0
@@ -37,19 +37,19 @@ packages:
     engines: {node: '>=6.9.0'}
     dev: true
 
-  /@babylonjs/core/5.13.2:
-    resolution: {integrity: sha512-aemACYnvQS4IVFMDYh6DeZ/seSj6S441HYbUykeXWjLcn7iVJtkQ3f0iqaY4bjFGmk3Fx9hzcaVVQZc/7MfGQw==}
+  /@babylonjs/core/5.18.0:
+    resolution: {integrity: sha512-nt+drqsyDrpV4guRnt1gruNLgHh2mWMZFH3LzYQIQm5MP6cgJW/XUbKpT0TvZ16jAP1Qvg0qUXX3lmt582I9kw==}
     dependencies:
       tslib: 2.4.0
     dev: false
 
-  /@babylonjs/loaders/5.13.3_ar3lik4oa5zxo4bintowpcy44i:
-    resolution: {integrity: sha512-tbCvW7n9tJZxMN8IGN7u7C+L7W6BM4SNFyOVHuVELVzoOHGtKF75qb4yvxViJgrrRleDUq36m2960O0iDolgJg==}
+  /@babylonjs/loaders/5.18.0_f5tregzyq2zonelajthv57vyze:
+    resolution: {integrity: sha512-YbfkPr2wvbsof4Ud9gibAjUSXkhF0vxvpo+fkes7swnWFB9SVNR2oD+J0xEKPtVzVSXt4sle0xSgUbwBvjXjOw==}
     peerDependencies:
       '@babylonjs/core': ^5.0.0
       babylonjs-gltf2interface: ^5.0.0
     dependencies:
-      '@babylonjs/core': 5.13.2
+      '@babylonjs/core': 5.18.0
       babylonjs-gltf2interface: 5.13.2
       tslib: 2.4.0
     dev: false

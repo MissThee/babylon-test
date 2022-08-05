@@ -189,9 +189,7 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
         }
         document.getElementById('controls')?.append(inputEl)
     }
-    setTimeout(() => {
-        addLockStaticPositionControl()
-    }, 3000)
+    addLockStaticPositionControl()
     // ------------------------固定弹力位置------------------------
     let stickObjArr: { mainMesh: Mesh, pointMesh: Mesh, joint: PhysicsJoint }[] = []
     const stickPosition = (enable: boolean) => {
@@ -295,9 +293,7 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
         }
         document.getElementById('controls')?.append(inputEl)
     }
-    setTimeout(() => {
-        addStickPositionControl()
-    }, 3000)
+    addStickPositionControl()
 
     const addNormalPhysicsControl = () => {
         const inputEl = document.createElement('input')
@@ -312,7 +308,5 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
         document.getElementById('controls')?.append(inputEl)
     }
 
-    setTimeout(() => {
-        addNormalPhysicsControl()
-    }, 3000)
+    addNormalPhysicsControl()
 }

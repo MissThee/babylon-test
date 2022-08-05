@@ -10,6 +10,7 @@ import * as AssetsImage from '../../src/assets/image'
 // import SixPicBox from "./object/SixPicBox";
 // import ObjModule from "./object/ObjModule";
 // 方块配置
+let max = 0
 const customObjOptions = [
     {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 16, -12]},
     {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 14, -9]},
@@ -98,22 +99,33 @@ export default async () => {
 
     // 创建 方块
     const customObjArr: CustomObj[] = []
-    setTimeout(() => {
-        customObjOptions.forEach((e, index) => {
+    customObjOptions.forEach((e) => {
+        const box = new CustomObj(scene, e.name, e.option)
+        box.mesh.position = new Vector3(...e.initPosition)
+        customObjArr.push(box)
+        shadowGenerator.addShadowCaster(box.mesh);
+    })
+
+    scene.whenReadyAsync(false).then(() => {
+        customObjArr.forEach((e, index) => {
             setTimeout(() => {
-                const box = new CustomObj(scene, e.name, e.option)
-                box.mesh.position = new Vector3(...e.initPosition)
-                customObjArr.push(box)
-                shadowGenerator.addShadowCaster(box.mesh);
-            }, index * 80)
+                e.show().then(() => {
+                    if (index === customObjArr.length - 1) {
+                        customObjArr.forEach(e => {
+                            e.usePhysicsImpostor()
+                        })
+                        setTimeout(() => {
+                            // 创建 可交互对象，添加交互动作。粒子点击交互动作
+                            import( "./util/addBehaviors").then(value => {
+                                const addBehaviors = value.default
+                                addBehaviors(scene, customObjArr, particleFlare)
+                            });
+                        }, 2000)
+                    }
+                })
+            }, index * 100)
         })
-        // 创建 可交互对象，添加交互动作
-        // 创建 粒子点击交互动作
-        import( "./util/addBehaviors").then(value => {
-            const addBehaviors = value.default
-            addBehaviors(scene, customObjArr, particleFlare)
-        });
-    }, 500)
+    })
 
     // ------------------------------------------------------------------------
     // 限制物体位置
@@ -148,7 +160,7 @@ export default async () => {
     }
 
     // 减少物体角速度
-    const reduceRotateSpeed = (meshArr: Mesh[]) => {
+    const reduceRotateVelocity = (meshArr: Mesh[]) => {
         for (let mesh of meshArr) {
             const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
             if (angularVelocity && !angularVelocity?.equals(Vector3.Zero())) {
@@ -156,7 +168,33 @@ export default async () => {
             }
         }
     }
+    const limitRotateVelocity = (meshArr: Mesh[]) => {
+        for (let mesh of meshArr) {
+            const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
+            if (angularVelocity && !angularVelocity?.equals(Vector3.Zero())) {
+                const maxVelocitySpeed = 30
+                mesh.physicsImpostor?.setAngularVelocity(new Vector3(
+                    Math.min(Math.abs(angularVelocity.x), maxVelocitySpeed) * (angularVelocity.x >= 0 ? 1 : -1),
+                    Math.min(Math.abs(angularVelocity.y), maxVelocitySpeed) * (angularVelocity.y >= 0 ? 1 : -1),
+                    Math.min(Math.abs(angularVelocity.z), maxVelocitySpeed) * (angularVelocity.z >= 0 ? 1 : -1),
+                ))
+            }
+        }
+    }
 
+    const limitLinearVelocity = (meshArr: Mesh[]) => {
+        for (let mesh of meshArr) {
+            const linearVelocity = mesh.physicsImpostor?.getLinearVelocity()
+            if (linearVelocity && !linearVelocity?.equals(Vector3.Zero())) {
+                const maxSpeed = 100
+                mesh.physicsImpostor?.setLinearVelocity(new Vector3(
+                    Math.min(Math.abs(linearVelocity.x), maxSpeed) * (linearVelocity.x >= 0 ? 1 : -1),
+                    Math.min(Math.abs(linearVelocity.y), maxSpeed) * (linearVelocity.y >= 0 ? 1 : -1),
+                    Math.min(Math.abs(linearVelocity.z), maxSpeed) * (linearVelocity.z >= 0 ? 1 : -1),
+                ))
+            }
+        }
+    }
     // 性能监测
     let stats: Stats;
     import('stats.js').then(value => {
@@ -171,7 +209,9 @@ export default async () => {
         {
             customObjArr.forEach(e => limitMeshPosition(e.mesh))
             limitMeshPosition(FollowMouseObj.getInstance(scene).mesh)
-            reduceRotateSpeed(customObjArr.slice(0, 6).map(e => e.mesh))
+            reduceRotateVelocity(customObjArr.slice(0, 6).map(e => e.mesh))
+            limitRotateVelocity(customObjArr.map(e => e.mesh))
+            limitLinearVelocity(customObjArr.map(e => e.mesh))
         }
         scene.render();
         stats?.end();
