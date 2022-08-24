@@ -9,8 +9,8 @@ import * as AssetsImage from '../../src/assets/image'
 // import CoordinateLine from "./util/CoordinateLine";
 // import SixPicBox from "./object/SixPicBox";
 // import ObjModule from "./object/ObjModule";
+
 // 方块配置
-let max = 0
 const customObjOptions = [
     {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 16, -12]},
     {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 14, -9]},
@@ -27,9 +27,7 @@ const customObjOptions = [
 ]
 
 export default async () => {
-
     const canvasEl = document.getElementById('app') as HTMLCanvasElement;
-
     // 创建 引擎
     const {Engine} = await import("@babylonjs/core/Engines/engine")
     await import ('@babylonjs/core/Audio/audioSceneComponent')// 引入声音插件

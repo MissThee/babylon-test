@@ -2,9 +2,11 @@
 
 import type {Scene} from "@babylonjs/core/scene";
 import {Vector3} from "@babylonjs/core/Maths/math.vector";
+import {Color3} from "@babylonjs/core/Maths/math.color";
 import {DirectionalLight} from "@babylonjs/core/Lights/directionalLight";
+import {sceneColor} from "../util/Constant";
 
-const BABYLON = {Vector3, DirectionalLight}
+const BABYLON = {Vector3, DirectionalLight, Color3}
 
 export default class Light1 {
     scene: Scene;
@@ -13,8 +15,11 @@ export default class Light1 {
     constructor(scene: Scene) {
         this.scene = scene
         this.light = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
-        this.light.intensity = 0.1;
+        this.light.intensity = 1;
+        this.light.diffuse = new BABYLON.Color3(...sceneColor.map(e => e / 5));
+        // this.light.specular =  new BABYLON.Color3(247 / 5 / 255, 207 / 5 / 255, 212 / 5 / 255);
         this.light.position = new BABYLON.Vector3(0, 30, 0);
+        // this.light.dispose()
     }
 }
 
@@ -24,7 +29,7 @@ export default class Light1 {
 // light1.specular = new BABYLON.Color3(1, 1, 1); // 镜面反射
 // light1.groundColor = new BABYLON.Color3(1, 1, 1); // 环境光
 //
-// const light2 = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
+// const light2 = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，照不到的面全黑
 // light2.intensity = 0.1;
 // light2.position = new BABYLON.Vector3(0, 30, 0);
 // light2.diffuse = new BABYLON.Color3(1, 1, 1);

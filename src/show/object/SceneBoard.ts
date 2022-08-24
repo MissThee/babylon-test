@@ -6,6 +6,7 @@ import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
 import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
 import {CreateGround} from '@babylonjs/core/Meshes/Builders/groundBuilder'
 import {CreatePlane} from '@babylonjs/core/Meshes/Builders/planeBuilder'
+import {sceneColor} from "../util/Constant";
 
 const MeshBuilder = {CreateGround, CreatePlane}
 const BABYLON = {Color3, StandardMaterial, MeshBuilder, PhysicsImpostor}
@@ -25,10 +26,8 @@ export default class SceneBoard {
         // 场景下部地板
         {
             const groundMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
-            // groundMaterial.ambientColor = new BABYLON.Color3(0.87, 0.71, 0.73)
-            groundMaterial.emissiveColor = new BABYLON.Color3(0.87, 0.71, 0.73)
-            // groundMaterial.diffuseColor = new BABYLON.Color3(0.87, 0.71, 0.73)
-            // groundMaterial.diffuseColor = new BABYLON.Color3(1,1,1)
+            // 此颜色与光照颜色线性叠加
+            groundMaterial.emissiveColor = new BABYLON.Color3(...sceneColor.map(e => e / 5 * 4))
             let ground = BABYLON.MeshBuilder.CreateGround('ground', {
                 width: this.deepLength, // x轴方向宽度
                 height: this.sideVerticalLength, // z轴方向宽度
@@ -47,7 +46,7 @@ export default class SceneBoard {
         }
 
         const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
-        sideMaterial.emissiveColor = new BABYLON.Color3(247 / 255, 207 / 255, 212 / 255)
+        sideMaterial.emissiveColor = new BABYLON.Color3(...sceneColor)
         // sideMaterial.ambientColor = new BABYLON.Color3(0.87, 0.71, 0.73)
         // sideMaterial.diffuseColor = new BABYLON.Color3(0.87, 0.71, 0.73)
 
