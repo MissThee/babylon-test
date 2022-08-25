@@ -1,23 +1,13 @@
-// import * as BABYLON from '@babylonjs/core';
-
-import type {Scene} from "@babylonjs/core/scene";
-import {Color3} from "@babylonjs/core/Maths/math.color";
-import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
-import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
-import {CreateGround} from '@babylonjs/core/Meshes/Builders/groundBuilder'
-import {CreatePlane} from '@babylonjs/core/Meshes/Builders/planeBuilder'
+import * as BABYLON from '@babylonjs/core';
 import {sceneColor} from "../util/Constant";
 
-const MeshBuilder = {CreateGround, CreatePlane}
-const BABYLON = {Color3, StandardMaterial, MeshBuilder, PhysicsImpostor}
-
 export default class SceneBoard {
-    scene: Scene
+    scene: BABYLON.Scene
     sideVerticalLength: number = 40
     sideHorizontalLength: number = 40
     deepLength: number = 10
 
-    constructor(scene: Scene, size?: { v?: number, h?: number, d?: number }) {
+    constructor(scene: BABYLON.Scene, size?: { v: number, h: number, d: number }) {
         this.scene = scene
         this.sideVerticalLength = size?.v || this.sideVerticalLength
         this.sideHorizontalLength = size?.h || this.sideHorizontalLength
@@ -28,6 +18,7 @@ export default class SceneBoard {
             const groundMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
             // 此颜色与光照颜色线性叠加
             groundMaterial.emissiveColor = new BABYLON.Color3(...sceneColor.map(e => e / 5 * 4))
+            groundMaterial.specularColor = new BABYLON.Color3(0) // 去除高光反光
             let ground = BABYLON.MeshBuilder.CreateGround('ground', {
                 width: this.deepLength, // x轴方向宽度
                 height: this.sideVerticalLength, // z轴方向宽度
@@ -45,10 +36,9 @@ export default class SceneBoard {
             ground.receiveShadows = true
         }
 
-        const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
-        sideMaterial.emissiveColor = new BABYLON.Color3(...sceneColor)
-        // sideMaterial.ambientColor = new BABYLON.Color3(0.87, 0.71, 0.73)
-        // sideMaterial.diffuseColor = new BABYLON.Color3(0.87, 0.71, 0.73)
+        // const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
+        // sideMaterial.emissiveColor = new BABYLON.Color3(...sceneColor)
+        // sideMaterial.specularColor = new BABYLON.Color3(0) // 去除高光反光
 
         {
             // 场景右边挡板
@@ -57,6 +47,7 @@ export default class SceneBoard {
                 height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 0
             })
+            wallRight.renderingGroupId = 99
             wallRight.position.y = this.sideHorizontalLength / 2
             wallRight.position.z = this.sideVerticalLength / 2
             wallRight.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -67,7 +58,8 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            wallRight.material = sideMaterial
+            // wallRight.material = sideMaterial
+            wallRight.isVisible = false
         }
 
         {
@@ -77,6 +69,7 @@ export default class SceneBoard {
                 height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 1
             })
+            wallLeft.renderingGroupId = 99
             wallLeft.position.y = this.sideHorizontalLength / 2
             wallLeft.position.z = -this.sideVerticalLength / 2
             wallLeft.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -87,7 +80,8 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            wallLeft.material = sideMaterial
+            // wallLeft.material = sideMaterial
+            wallLeft.isVisible = false
         }
 
         {
@@ -97,6 +91,7 @@ export default class SceneBoard {
                 height: this.sideHorizontalLength, // y轴方向宽度
                 sideOrientation: 1
             })
+            wallBack.renderingGroupId = 99
             wallBack.position.y = this.sideHorizontalLength / 2
             wallBack.position.x = -this.deepLength / 2
             wallBack.rotation.y = Math.PI / 2
@@ -109,7 +104,9 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            wallBack.material = sideMaterial
+            // wallBack.material = sideMaterial
+            wallBack.isVisible = false
+
         }
 
         {
@@ -121,6 +118,7 @@ export default class SceneBoard {
             })
             wallLimit.position.y = this.sideHorizontalLength / 2
             wallLimit.rotation.y = Math.PI / 2
+            wallLimit.position.x = this.deepLength / 2
 
             wallLimit.physicsImpostor = new BABYLON.PhysicsImpostor(
                 wallLimit, BABYLON.PhysicsImpostor.BoxImpostor,
@@ -132,7 +130,6 @@ export default class SceneBoard {
             )
             wallLimit.isVisible = false
 
-            wallLimit.position.x = this.deepLength / 2
         }
 
         {
@@ -153,7 +150,9 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            wallLimitTop.material = sideMaterial
+            // wallLimitTop.material = sideMaterial
+            wallLimitTop.isVisible = false
+
         }
     }
 }

@@ -1,16 +1,14 @@
 import * as BABYLON from '@babylonjs/core';
-import {sceneColor} from "../util/Constant";
 
 export default class Light1 {
     scene: BABYLON.Scene;
-    light: BABYLON.DirectionalLight;
+    light: any;
 
     constructor(scene: BABYLON.Scene) {
         this.scene = scene
-        this.light = new BABYLON.DirectionalLight('light1', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
+        this.light = new BABYLON.DirectionalLight('light2', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
         this.light.intensity = 1;
-        this.light.diffuse = new BABYLON.Color3(...sceneColor.map(e => e / 5));
-        // this.light.specular =  new BABYLON.Color3(247 / 5 / 255, 207 / 5 / 255, 212 / 5 / 255);
+        this.light.diffuse = new BABYLON.Color3(1,1,1);
         this.light.position = new BABYLON.Vector3(0, 30, 0);
         // this.light.dispose()
     }

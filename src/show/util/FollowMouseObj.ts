@@ -1,38 +1,24 @@
-// import * as BABYLON from '@babylonjs/core';
-
-import type {Scene} from "@babylonjs/core/scene";
-import type {Mesh} from "@babylonjs/core/Meshes/mesh";
-import {Vector3, Matrix} from "@babylonjs/core/Maths/math.vector";
-import {Color3} from "@babylonjs/core/Maths/math.color";
-import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
-import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
-import {PointerEventTypes} from "@babylonjs/core/Events/pointerEvents";
-
-import {CreateSphere} from '@babylonjs/core/Meshes/Builders/sphereBuilder'
-
-const MeshBuilder = {CreateSphere}
-const BABYLON = {Color3, Vector3, StandardMaterial, MeshBuilder, PhysicsImpostor, PointerEventTypes, Matrix}
-
-let instance: FollowMouseObj;
+import * as BABYLON from '@babylonjs/core';
 
 export default class FollowMouseObj {
-    scene: Scene;
-    mesh: Mesh;
-    material?: StandardMaterial
+    scene: BABYLON.Scene;
+    mesh: BABYLON.Mesh;
+    material?: BABYLON.StandardMaterial
     mouseVector = new BABYLON.Vector3;
+    static instance: FollowMouseObj
 
-    static getInstance(scene: Scene) {
-        if (!instance) {
-            instance = new FollowMouseObj(scene)
+    static getInstance(scene: BABYLON.Scene) {
+        if (!this.instance) {
+            this.instance = new this(scene)
         }
-        return instance
+        return this.instance
     }
 
-    constructor(scene: Scene) {
+    constructor(scene: BABYLON.Scene) {
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {segments: 1}, this.scene)
         this.mesh.isPickable = false
-        this.mesh.isVisible = false
+        // this.mesh.isVisible = false
         // this.initMaterial()
         this.initImpostor()
         this.initFollowMouseAction()
@@ -53,13 +39,19 @@ export default class FollowMouseObj {
         this.scene.onPointerObservable.add((pointerInfo) => {
             switch (pointerInfo.type) {
                 case BABYLON.PointerEventTypes.POINTERMOVE:
-                case BABYLON.PointerEventTypes.POINTERDOWN:
+                    // case BABYLON.PointerEventTypes.POINTERDOWN:
                     pointerInfo.event.preventDefault();
                     if (!this.mesh || !this.scene.activeCamera) return;
-                    // 调整z值可让方块落在平面的高度
+                    // 调整z值可修改方块落在平面的高度
                     // console.log(pointerInfo.event.offsetX,pointerInfo.event.clientX,pointerInfo.event.pageX)
-                    this.mouseVector.set((pointerInfo.event.offsetX) / this.scene.getEngine().getRenderWidth(), (pointerInfo.event.offsetY / this.scene.getEngine().getRenderHeight()), 0);
-                    let uvec = BABYLON.Vector3.Unproject(this.mouseVector, 1, 1, BABYLON.Matrix.Identity(), this.scene.activeCamera.getViewMatrix(), this.scene.activeCamera.getProjectionMatrix());
+                    this.mouseVector.set(
+                        pointerInfo.event.offsetX / this.scene.getEngine().getRenderWidth(),
+                        pointerInfo.event.offsetY / this.scene.getEngine().getRenderHeight(),
+                        0
+                    );
+                    console.log(' this.mouseVector', this.mouseVector, this.scene.pointerX,this.scene.pointerY)
+                    let uvec = BABYLON.Vector3.Unproject(
+                        this.mouseVector, 1, 1, BABYLON.Matrix.Identity(), this.scene.activeCamera.getViewMatrix(), this.scene.activeCamera.getProjectionMatrix());
                     const dir = uvec.subtract(this.scene.activeCamera.position).normalize();
                     // 调整此处坐标，可让方块落在垂直于轴的面上
                     const distance = -this.scene.activeCamera.position.x / dir.x;

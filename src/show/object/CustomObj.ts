@@ -1,28 +1,14 @@
-// import * as BABYLON from '@babylonjs/core';
-
-import type {Scene} from "@babylonjs/core/scene";
-import type {Mesh} from "@babylonjs/core/Meshes/mesh";
-import {Vector3} from "@babylonjs/core/Maths/math.vector";
-import {Color3} from "@babylonjs/core/Maths/math.color";
-import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
-import {Animation} from '@babylonjs/core/Animations/animation'
-import {CubicEase} from '@babylonjs/core/Animations/easing'
-import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
-import {Texture} from '@babylonjs/core/Materials/Textures/texture'
 import '@babylonjs/core/Animations/animatable'
-import {CreateBox} from '@babylonjs/core/Meshes/Builders/boxBuilder'
-
-const MeshBuilder = {CreateBox}
-const BABYLON = {Color3, Vector3, StandardMaterial, MeshBuilder, Animation, CubicEase, PhysicsImpostor, Texture}
+import * as BABYLON from "@babylonjs/core";
 
 class CustomObj {
-    scene: Scene
-    mesh: Mesh
-    material?: StandardMaterial
+    scene: BABYLON.Scene
+    mesh: BABYLON.Mesh
+    material?: BABYLON.StandardMaterial
     isLockedPosition: boolean = false
     options?
 
-    constructor(scene: Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
+    constructor(scene: BABYLON.Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
@@ -72,7 +58,7 @@ class CustomObj {
             this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
             this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
             this.material.emissiveColor = new BABYLON.Color3(1, 1, 1)
-            this.material.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05)
+            this.material.specularColor = BABYLON.Color3.Black()
             this.mesh.material = this.material;
         }
     }

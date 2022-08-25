@@ -1,30 +1,11 @@
-// import * as BABYLON from '@babylonjs/core';
-
-import type {AbstractMesh, Nullable} from "@babylonjs/core";
-import type {Scene} from "@babylonjs/core/scene";
-import type {Mesh} from "@babylonjs/core/Meshes/mesh";
-import {Vector3} from "@babylonjs/core/Maths/math.vector";
-import {Color3} from "@babylonjs/core/Maths/math.color";
-import {DirectionalLight} from "@babylonjs/core/Lights/directionalLight";
-import {StandardMaterial} from "@babylonjs/core/Materials/standardMaterial";
-import {Animation} from '@babylonjs/core/Animations/animation'
-import {CubicEase} from '@babylonjs/core/Animations/easing'
-import {PhysicsImpostor} from '@babylonjs/core/Physics/physicsImpostor'
-import {Texture} from '@babylonjs/core/Materials/Textures/texture'
-import {PointerEventTypes} from "@babylonjs/core/Events/pointerEvents";
-import {PhysicsJoint} from "@babylonjs/core/Physics/physicsJoint";
+import * as BABYLON from '@babylonjs/core';
 import '@babylonjs/core/Culling/ray'
-import {CreateSphere} from '@babylonjs/core/Meshes/Builders/sphereBuilder'
-
-const MeshBuilder = {CreateSphere}
-const BABYLON = {Color3, Vector3, DirectionalLight, StandardMaterial, MeshBuilder, Animation, CubicEase, PhysicsImpostor, Texture, PhysicsJoint, PointerEventTypes}
-
 import FollowMouseObj from "./FollowMouseObj";
 import * as Constant from "./Constant";
-import CustomObj from '../object/CustomObj'
-import ParticleFlare from "../object/ParticleFlare";
+import ParticleFlare from "./ParticleFlare";
+import type CustomObj from '../object/CustomObj'
 
-export default (scene: Scene, customObjArr: CustomObj[], particleFlare: ParticleFlare) => {
+export default (scene: BABYLON.Scene, customObjArr: CustomObj[]) => {
     // 拖动基础变量
     enum PositionLockType {
         None,
@@ -34,16 +15,16 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
 
     let positionLockType: PositionLockType = PositionLockType.None
     const followMouseObj = FollowMouseObj.getInstance(scene)
-    let currentPickedMesh: Nullable<AbstractMesh>
+    let currentPickedMesh: BABYLON.Nullable<BABYLON.AbstractMesh>
     let pointerDownTime: number = 0
     let springDragStartFunc: () => void
     let isSpringDragging: boolean = false
-    let currentFollowJoint: Nullable<PhysicsJoint>
+    let currentFollowJoint: BABYLON.Nullable<BABYLON.PhysicsJoint>
     scene.onPointerObservable.add((pointerInfo) => {
         // 物理弹力拖动
         if (positionLockType === PositionLockType.Spring || positionLockType === PositionLockType.None) {
             switch (pointerInfo.type) {
-                case PointerEventTypes.POINTERDOWN:
+                case BABYLON.PointerEventTypes.POINTERDOWN:
                     if (currentPickedMesh?.physicsImpostor && followMouseObj.mesh.physicsImpostor && currentFollowJoint) {
                         scene.getPhysicsEngine()?.removeJoint(currentPickedMesh.physicsImpostor, followMouseObj.mesh.physicsImpostor, currentFollowJoint)
                         isSpringDragging = false
@@ -121,14 +102,21 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
                     );
                     if (pickingInfo?.pickedMesh && pickingInfo.ray && pickingInfo?.pickedPoint && scene.activeCamera) {
                         pickingInfo.pickedMesh.physicsImpostor?.applyImpulse(pickingInfo.ray.origin.normalize().scale(-15), pickingInfo.pickedPoint)
-                        particleFlare.particleSystem.emitter = followMouseObj.mesh.position.clone().add(
-                            scene.activeCamera.position.subtract(pickingInfo.pickedPoint).normalize().scale(Constant.sceneDeep / 2)
-                        )
-                        particleFlare.particleSystem.start()
+                        // 创建 粒子效果
+                        ParticleFlare.getInstance(scene).start(pickingInfo.pickedPoint.clone())
+                        // particleFlare.start(
+                        //     //从鼠标方块位置增加距离
+                        //     followMouseObj.mesh.position.clone()
+                        //         .add(
+                        //             //增加从点击位置方块到摄像机视窗鼠标位置
+                        //             scene.activeCamera.position.subtract(pickingInfo.pickedPoint).normalize().scale(Constant.sceneDeep)
+                        //         )
+                        // )
                     }
                 }
                 break
         }
+
         // 静态拖动
         if (positionLockType === PositionLockType.Static) {
             switch (pointerInfo.type) {
@@ -191,7 +179,7 @@ export default (scene: Scene, customObjArr: CustomObj[], particleFlare: Particle
     }
     addLockStaticPositionControl()
     // ------------------------固定弹力位置------------------------
-    let stickObjArr: { mainMesh: Mesh, pointMesh: Mesh, joint: PhysicsJoint }[] = []
+    let stickObjArr: { mainMesh: BABYLON.Mesh, pointMesh: BABYLON.Mesh, joint: BABYLON.PhysicsJoint }[] = []
     const stickPosition = (enable: boolean) => {
         positionLockType = enable ? PositionLockType.Spring : PositionLockType.Spring
         stickObjArr.forEach(stickObj => {

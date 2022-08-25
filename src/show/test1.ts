@@ -1,14 +1,10 @@
 import type CustomObj from './object/CustomObj'
-import type {Mesh} from "@babylonjs/core/Meshes/mesh";
 import * as Constant from './util/Constant'
 import * as AssetsImage from '../../src/assets/image'
+import * as BABYLON from '@babylonjs/core';
+import PhysicsStableHelper from "./util/PhysicsStableHelper";
 
-// import * as BABYLON from '@babylonjs/core';
-// import "@babylonjs/loaders";
-
-// import CoordinateLine from "./util/CoordinateLine";
 // import SixPicBox from "./object/SixPicBox";
-// import ObjModule from "./object/ObjModule";
 
 // 方块配置
 const customObjOptions = [
@@ -27,35 +23,42 @@ const customObjOptions = [
 ]
 
 export default async () => {
-    const canvasEl = document.getElementById('app') as HTMLCanvasElement;
+    const canvasEl = document.createElement('canvas');
+    canvasEl.style.userSelect = 'none'
+    canvasEl.style.width = '100%'
+    canvasEl.style.height = '100%'
+    canvasEl.style.display = 'block'
+    canvasEl.style.position = 'relative'
+    canvasEl.style.overflow = 'hidden'
+    document.getElementById('app')?.appendChild(canvasEl)
     // 创建 引擎
-    const {Engine} = await import("@babylonjs/core/Engines/engine")
     await import ('@babylonjs/core/Audio/audioSceneComponent')// 引入声音插件
-    const engine = new Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
+    const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
     // 创建 场景
-    const {Scene} = await import("@babylonjs/core/scene")
-    const scene = new Scene(engine);
+    const scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
+    scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
 
-    const {Vector3} = await import("@babylonjs/core/Maths/math.vector");
-    const {Color4, Color3} = await import( "@babylonjs/core/Maths/math.color");
-    scene.clearColor = new Color4(247 / 255, 207 / 255, 212 / 255, 1)
-    scene.ambientColor = new Color3(1, 1, 1); // 场景环境光。可让材质的环境光有效果
     // 添加 物理引擎
-    const cannonJSPluginPromise = import( "@babylonjs/core/Physics/Plugins/cannonJSPlugin")
-    const cannonPromise = import('cannon')
-    const [{CannonJSPlugin}, cannonPromiseRes] = await Promise.all([cannonJSPluginPromise, cannonPromise])
+    const cannon = await import('cannon')
     await import('@babylonjs/core/Physics/physicsEngineComponent')
-    scene.enablePhysics(new Vector3(0, Constant.gravity, 0), new CannonJSPlugin(true, 1, cannonPromiseRes.default));
+    scene.enablePhysics(new BABYLON.Vector3(0, Constant.gravity, 0), new BABYLON.CannonJSPlugin(true, 1, cannon));
+
+    const sceneSize = {
+        height: Constant.cameraDistance * Math.tan(Constant.cameraFov),
+        width: Constant.cameraDistance * Math.tan(Constant.cameraFov) * (scene.getEngine().getRenderWidth() / scene.getEngine().getRenderHeight()),
+        deep: Constant.sceneDeep,
+    }
+
     // 创建 相机
-    const {ArcRotateCamera} = await import("@babylonjs/core/Cameras/arcRotateCamera")
-    const camera = new ArcRotateCamera(
+    const camera = new BABYLON.ArcRotateCamera(
         'ArcRotateCamera',
         0,
         0.5 * Math.PI,
         Constant.sceneDeep / 2 + Constant.cameraDistanceFix + Constant.cameraDistance,
-        new Vector3(
+        new BABYLON.Vector3(
             0,
-            Constant.cameraDistance * Math.tan(Constant.cameraFov) / 2,
+            sceneSize.height / 2,
             0
         ),
         scene
@@ -63,43 +66,41 @@ export default async () => {
     camera.fov = Constant.cameraFov
     camera.lowerRadiusLimit = 2
     if (Constant.canMoveCamera) {
-        camera.attachControl(canvasEl, false)
+        camera.attachControl(scene.getEngine().getRenderingCanvas(), false)
     }
+
     // 创建 光源
     const Light1 = (await import("./light/Light1")).default
     const light1 = new Light1(scene)
-    // new CoordinateLine()
+    // const Light2 = (await import("./light/Light2")).default
+    // const light2 = new Light2(scene)
+
     // 创建 点击声音
     import("./sound/ClickSound").then(value => {
         new value.default(scene)
     })
+
+    const CoordinateLine = (await import("./util/CoordinateLine")).default
+    new CoordinateLine(scene)
+
     // SixPicBox(scene)
-    // ObjModule(scene)
+    const ObjModule = (await import("./object/ObjModule")).default
+    new ObjModule(scene)
 
-    // 创建 场景挡板
+
     const SceneBoard = (await import ('./object/SceneBoard')).default
-    new SceneBoard(scene, {
-        h: Constant.cameraDistance * Math.tan(Constant.cameraFov),
-        v: Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height),
-        d: Constant.sceneDeep,
-    })
-
-    // 创建 粒子效果
-    const ParticleFlare = (await import ("./object/ParticleFlare")).default
-    const particleFlare = new ParticleFlare(scene)
+    new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
 
     // 创建 影子生成器
-    const {ShadowGenerator} = await import("@babylonjs/core/Lights/Shadows/shadowGenerator")
     await import ('@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent')
-    const shadowGenerator = new ShadowGenerator(1024, light1.light);
-
+    const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
     const CustomObj = (await import( './object/CustomObj')).default
 
     // 创建 方块
     const customObjArr: CustomObj[] = []
     customObjOptions.forEach((e) => {
         const box = new CustomObj(scene, e.name, e.option)
-        box.mesh.position = new Vector3(...e.initPosition)
+        box.mesh.position = new BABYLON.Vector3(...e.initPosition)
         customObjArr.push(box)
         shadowGenerator.addShadowCaster(box.mesh);
     })
@@ -116,7 +117,7 @@ export default async () => {
                             // 创建 可交互对象，添加交互动作。粒子点击交互动作
                             import( "./util/addBehaviors").then(value => {
                                 const addBehaviors = value.default
-                                addBehaviors(scene, customObjArr, particleFlare)
+                                addBehaviors(scene, customObjArr)
                             });
                         }, 2000)
                     }
@@ -125,74 +126,6 @@ export default async () => {
         })
     })
 
-    // ------------------------------------------------------------------------
-    // 限制物体位置
-    const sceneBoxHeight = Constant.cameraDistance * Math.tan(Constant.cameraFov)
-    const sceneBoxWidth = Constant.cameraDistance * Math.tan(Constant.cameraFov) * (canvasEl.width / canvasEl.height)
-    const safePadding = 0.5
-    const limitMeshPosition = (mesh: Mesh) => {
-        if (mesh.position.x >= Constant.sceneDeep / 2 - safePadding) {
-            mesh.position.x = Constant.sceneDeep / 2 - safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-        if (mesh.position.x < -Constant.sceneDeep / 2 + safePadding) {
-            mesh.position.x = -Constant.sceneDeep / 2 + safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-        if (mesh.position.z > sceneBoxWidth / 2 - safePadding) {
-            mesh.position.z = sceneBoxWidth / 2 - safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-        if (mesh.position.z < -sceneBoxWidth / 2 + safePadding) {
-            mesh.position.z = -sceneBoxWidth / 2 + safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-        if (mesh.position.y > sceneBoxHeight - safePadding) {
-            mesh.position.y = sceneBoxHeight - safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-        if (mesh.position.y < safePadding) {
-            mesh.position.y = safePadding
-            mesh.physicsImpostor?.setLinearVelocity(Vector3.Zero())
-        }
-    }
-
-    // 减少物体角速度
-    const reduceRotateVelocity = (meshArr: Mesh[]) => {
-        for (let mesh of meshArr) {
-            const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
-            if (angularVelocity && !angularVelocity?.equals(Vector3.Zero())) {
-                mesh.physicsImpostor?.setAngularVelocity(angularVelocity.scale(0.9))
-            }
-        }
-    }
-    const limitRotateVelocity = (meshArr: Mesh[]) => {
-        for (let mesh of meshArr) {
-            const angularVelocity = mesh.physicsImpostor?.getAngularVelocity()
-            if (angularVelocity && !angularVelocity?.equals(Vector3.Zero())) {
-                const maxVelocitySpeed = 30
-                mesh.physicsImpostor?.setAngularVelocity(new Vector3(
-                    Math.min(Math.abs(angularVelocity.x), maxVelocitySpeed) * (angularVelocity.x >= 0 ? 1 : -1),
-                    Math.min(Math.abs(angularVelocity.y), maxVelocitySpeed) * (angularVelocity.y >= 0 ? 1 : -1),
-                    Math.min(Math.abs(angularVelocity.z), maxVelocitySpeed) * (angularVelocity.z >= 0 ? 1 : -1),
-                ))
-            }
-        }
-    }
-
-    const limitLinearVelocity = (meshArr: Mesh[]) => {
-        for (let mesh of meshArr) {
-            const linearVelocity = mesh.physicsImpostor?.getLinearVelocity()
-            if (linearVelocity && !linearVelocity?.equals(Vector3.Zero())) {
-                const maxSpeed = 100
-                mesh.physicsImpostor?.setLinearVelocity(new Vector3(
-                    Math.min(Math.abs(linearVelocity.x), maxSpeed) * (linearVelocity.x >= 0 ? 1 : -1),
-                    Math.min(Math.abs(linearVelocity.y), maxSpeed) * (linearVelocity.y >= 0 ? 1 : -1),
-                    Math.min(Math.abs(linearVelocity.z), maxSpeed) * (linearVelocity.z >= 0 ? 1 : -1),
-                ))
-            }
-        }
-    }
     // 性能监测
     let stats: Stats;
     import('stats.js').then(value => {
@@ -204,13 +137,12 @@ export default async () => {
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
-        {
-            customObjArr.forEach(e => limitMeshPosition(e.mesh))
-            limitMeshPosition(FollowMouseObj.getInstance(scene).mesh)
-            reduceRotateVelocity(customObjArr.slice(0, 6).map(e => e.mesh))
-            limitRotateVelocity(customObjArr.map(e => e.mesh))
-            limitLinearVelocity(customObjArr.map(e => e.mesh))
-        }
+
+        PhysicsStableHelper.limitMeshPosition([...customObjArr.map(e => e.mesh), FollowMouseObj.getInstance(scene).mesh], sceneSize)
+        PhysicsStableHelper.limitRotateVelocity(customObjArr.map(e => e.mesh))
+        PhysicsStableHelper.limitLinearVelocity(customObjArr.map(e => e.mesh))
+        PhysicsStableHelper.reduceRotateVelocity(customObjArr.slice(0, 6).map(e => e.mesh))
+
         scene.render();
         stats?.end();
     })
