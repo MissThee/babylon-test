@@ -137,12 +137,10 @@ export default async () => {
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
-
         PhysicsStableHelper.limitMeshPosition([...customObjArr.map(e => e.mesh), FollowMouseObj.getInstance(scene).mesh], sceneSize)
         PhysicsStableHelper.limitRotateVelocity(customObjArr.map(e => e.mesh))
         PhysicsStableHelper.limitLinearVelocity(customObjArr.map(e => e.mesh))
         PhysicsStableHelper.reduceRotateVelocity(customObjArr.slice(0, 6).map(e => e.mesh))
-
         scene.render();
         stats?.end();
     })
