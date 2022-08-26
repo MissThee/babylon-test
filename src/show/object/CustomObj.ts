@@ -4,62 +4,27 @@ import * as BABYLON from "@babylonjs/core";
 class CustomObj {
     scene: BABYLON.Scene
     mesh: BABYLON.Mesh
-    material?: BABYLON.StandardMaterial
-    isLockedPosition: boolean = false
     options?
 
     constructor(scene: BABYLON.Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
+        this.mesh.scaling = BABYLON.Vector3.Zero()
         this.mesh.isPickable = true
         this.useMaterial()
-        this.initAnimation()
-        this.mesh.scaling = BABYLON.Vector3.Zero()
     }
 
-    initAnimation() {
-        let animation = new BABYLON.Animation('showOn', 'scaling', 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
-        animation.setKeys([
-            {frame: 0, value: BABYLON.Vector3.Zero()},
-            {frame: 10, value: new BABYLON.Vector3(1, 1, 1)},
-        ])
-        this.mesh.animations.push(animation)
-    }
-
-    show() {
-        // return new Promise<void>((resolve) => {
-        //     BABYLON.Animation.CreateAndStartAnimation(
-        //         'showOn',
-        //         this.mesh,
-        //         'scaling',
-        //         60,
-        //         10,
-        //         BABYLON.Vector3.Zero(),
-        //         new BABYLON.Vector3(1, 1, 1),
-        //         BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
-        //         new BABYLON.CubicEase(),
-        //         () => {
-        //             this.usePhysicsImpostor()
-        //             resolve()
-        //         }
-        //     )
-        // })
-        return new Promise<void>((resolve) => {
-            this.scene.beginAnimation(this.mesh, 0, 10, false, 1, resolve)
-        })
-    }
-
-    useMaterial() {
+    private useMaterial() {
         if (this.mesh.material) {
             return
         }
         if (this.options?.materialOpt?.textureUrl) {
-            this.material = new BABYLON.StandardMaterial("textMaterial", this.scene);
-            this.material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
-            this.material.emissiveColor = new BABYLON.Color3(1, 1, 1)
-            this.material.specularColor = BABYLON.Color3.Black()
-            this.mesh.material = this.material;
+            const material = new BABYLON.StandardMaterial("textMaterial", this.scene);
+            material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
+            material.emissiveColor = new BABYLON.Color3(1, 1, 1)
+            material.specularColor = BABYLON.Color3.Black()
+            this.mesh.material = material;
         }
     }
 
@@ -74,36 +39,6 @@ class CustomObj {
         }, this.scene)
     }
 
-
-    lockObj(param?: { position: [x: number, y: number, z: number], rotation?: [x: number, y: number, z: number] }): void
-    lockObj(param?: { position?: [x: number, y: number, z: number], rotation: [x: number, y: number, z: number] }): void
-    lockObj(param?: { position?: [x: number, y: number, z: number], rotation?: [x: number, y: number, z: number] }) {
-        this.isLockedPosition = !!param
-        if (this.isLockedPosition) {
-            // 绑定物理效果后不能执行动画，需要先清除物理效果
-            this.mesh.physicsImpostor?.dispose()
-            const framePerSecond = 10
-            const second = 1.5 // 动画持续总时间
-            // 位置变化
-            const lockPosition = new BABYLON.Animation("lockPosition", "position", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
-            lockPosition.setKeys([
-                {frame: 0, value: this.mesh.position},
-                {frame: framePerSecond * second, value: new BABYLON.Vector3(...(param?.position || []))},
-            ]);
-            this.mesh.animations.push(lockPosition)
-            // 角度变化
-            const lockRotation = new BABYLON.Animation("lockRotation", "rotation", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
-            lockRotation.setKeys([
-                {frame: 0, value: this.mesh.rotation},
-                {frame: framePerSecond * second, value: new BABYLON.Vector3(...(param?.rotation || []))},
-            ]);
-            this.mesh.animations.push(lockRotation)
-            // 执行动画
-            this.scene.beginAnimation(this.mesh, 0, framePerSecond * second, false, 4);
-        } else {
-            this.usePhysicsImpostor()
-        }
-    }
 }
 
 export default CustomObj

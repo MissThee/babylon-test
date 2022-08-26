@@ -9,16 +9,20 @@ class ObjModule {
 
     constructor(scene: BABYLON.Scene) {
         this.scene = scene;
+
+        const position = {x: 0, y: 5, z: 0}
+
         this.assetsManager = new BABYLON.AssetsManager();
         const meshTask1 = this.assetsManager.addMeshTask("customModule", "", "/module/", "letterA.gltf")
-        // const position = {x:-25, y: 2, z: -6}
-        const position = {x: 0, y: 5, z: -8}
+
+
         meshTask1.onSuccess = (t: BABYLON.MeshAssetTask) => {
             t.loadedMeshes.forEach((mesh, index) => {
-                mesh.scaling = new BABYLON.Vector3(3, 3, 3)
-                mesh.position.x += position.x
-                mesh.position.y += position.y
-                mesh.position.z += position.z
+                // mesh.position.x += position.x
+                // mesh.position.y += position.y
+                // mesh.position.z += position.z
+                // mesh.rotation.y = 0.5
+
                 if (mesh.material) {
                     (mesh.material as StandardMaterial).ambientColor = new BABYLON.Color3(1, 1, 1); // 使用环境光辅助提高贴图亮度
                     (mesh.material as StandardMaterial).specularColor = BABYLON.Color3.Black();
@@ -32,13 +36,29 @@ class ObjModule {
                 //     e.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, friction: 1, restitution: 0}, scene);
                 // })
                 if (index === 0) {
-                    mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, friction: 1, restitution: 0}, scene);
-                }
 
+                    mesh.position.y -= 0.13
+                    // 创建包裹用的盒
+                    const wrapperMesh = BABYLON.MeshBuilder.CreateBox('box', {size: 1})
+                    {
+                        const standardMaterial = new BABYLON.StandardMaterial('', scene)
+                        standardMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0)
+                        standardMaterial.alpha = 0.05
+                        wrapperMesh.material = standardMaterial
+                    }
+                    // 包裹为子模型
+                    wrapperMesh.addChild(mesh)
+                    wrapperMesh.setAbsolutePosition(new BABYLON.Vector3(position.x, position.y, position.z))
+                    wrapperMesh.scaling = new BABYLON.Vector3(4, 4, 4)
+                    wrapperMesh.physicsImpostor = new BABYLON.PhysicsImpostor(wrapperMesh, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 1, friction: 10, restitution: 0}, scene);
+                }
             });
         };
         this.assetsManager.load()
+
         // BABYLON.SceneLoader.AppendAsync("/module/", "emerald.obj",scene)
+
+
     }
 }
 

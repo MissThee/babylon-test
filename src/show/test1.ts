@@ -3,7 +3,7 @@ import * as Constant from './util/Constant'
 import * as AssetsImage from '../../src/assets/image'
 import * as BABYLON from '@babylonjs/core';
 import PhysicsStableHelper from "./util/PhysicsStableHelper";
-
+import BehaviorBundle from "./util/BehaviorBundle"
 // import SixPicBox from "./object/SixPicBox";
 
 // 方块配置
@@ -105,20 +105,21 @@ export default async () => {
         shadowGenerator.addShadowCaster(box.mesh);
     })
 
+    const behaviorBundle = new BehaviorBundle(scene, customObjArr)
+    behaviorBundle.addLockStaticPositionControl()
+    behaviorBundle.addNormalPhysicsControl()
+    behaviorBundle.addStickPositionControl()
     scene.whenReadyAsync(false).then(() => {
         customObjArr.forEach((e, index) => {
             setTimeout(() => {
-                e.show().then(() => {
+                behaviorBundle.animateShow(e.mesh).then(() => {
                     if (index === customObjArr.length - 1) {
                         customObjArr.forEach(e => {
                             e.usePhysicsImpostor()
                         })
                         setTimeout(() => {
                             // 创建 可交互对象，添加交互动作。粒子点击交互动作
-                            import( "./util/addBehaviors").then(value => {
-                                const addBehaviors = value.default
-                                addBehaviors(scene, customObjArr)
-                            });
+                            behaviorBundle.addPointerBehavior()
                         }, 2000)
                     }
                 })

@@ -63,11 +63,12 @@ abstract class PhysicsStableHelper {
             const linearVelocity = mesh.physicsImpostor?.getLinearVelocity()
             if (linearVelocity && !linearVelocity?.equals(BABYLON.Vector3.Zero())) {
                 const maxSpeed = 100
-                mesh.physicsImpostor?.setLinearVelocity(new BABYLON.Vector3(
-                    Math.min(Math.abs(linearVelocity.x), maxSpeed) * (linearVelocity.x >= 0 ? 1 : -1),
-                    Math.min(Math.abs(linearVelocity.y), maxSpeed) * (linearVelocity.y >= 0 ? 1 : -1),
-                    Math.min(Math.abs(linearVelocity.z), maxSpeed) * (linearVelocity.z >= 0 ? 1 : -1),
-                ))
+                const speed = Math.sqrt((Math.pow(linearVelocity.x, 2) + Math.pow(linearVelocity.y, 2) + Math.pow(linearVelocity.z, 2)))
+                const scaleRate = maxSpeed / speed
+                if (scaleRate < 1) {
+                    mesh.physicsImpostor?.setLinearVelocity(linearVelocity.scale(scaleRate))
+
+                }
             }
         }
     }
