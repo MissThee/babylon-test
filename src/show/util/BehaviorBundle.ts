@@ -3,7 +3,6 @@ import '@babylonjs/core/Culling/ray'
 import FollowMouseObj from "./FollowMouseObj";
 import * as Constant from "./Constant";
 import ParticleFlare from "./ParticleFlare";
-import type CustomObj from '../object/CustomObj'
 
 // 全局物体锁定状态
 enum PositionLockType {
@@ -11,10 +10,14 @@ enum PositionLockType {
     Static,
     Spring,
 }
-export interface TargetObjArr {
+
+export declare interface BehaviorBundleObj {
     mesh: BABYLON.Mesh,
     usePhysicsImpostor: () => any
+    endScaling?: BABYLON.Vector3
+
 }
+
 class BehaviorBundle {
     scene: BABYLON.Scene
     positionLockType: PositionLockType = PositionLockType.None;
@@ -24,15 +27,15 @@ class BehaviorBundle {
     springDragStartFunc: (() => void) | null = null
     isSpringDragging: boolean = false
     currentFollowJoint: BABYLON.Nullable<BABYLON.PhysicsJoint> = null
-    targetObjArr: TargetObjArr[]
+    behaviorBundleObj: BehaviorBundleObj[]
 
-    constructor(scene: BABYLON.Scene, targetObjArr: TargetObjArr[]) {
+    constructor(scene: BABYLON.Scene, behaviorBundleObj: BehaviorBundleObj[]) {
         this.scene = scene
-        this.targetObjArr = targetObjArr
+        this.behaviorBundleObj = behaviorBundleObj
         this.followMouseObj = FollowMouseObj.getInstance(scene);
     }
 
-    animateShow(mesh: BABYLON.Mesh) {
+    animateZoomShow(behaviorBundleObj: BehaviorBundleObj) {
         // return new Promise<void>((resolve) => {
         //     BABYLON.Animation.CreateAndStartAnimation(
         //         'showOn',
@@ -50,14 +53,17 @@ class BehaviorBundle {
         //         }
         //     )
         // })
+        const mesh = behaviorBundleObj.mesh
+        const endScaling = behaviorBundleObj.endScaling || BABYLON.Vector3.One()
         let animation = new BABYLON.Animation('showOn', 'scaling', 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
         animation.setKeys([
             {frame: 0, value: BABYLON.Vector3.Zero()},
-            {frame: 10, value: new BABYLON.Vector3(1, 1, 1)},
+            {frame: 10, value: endScaling},
         ])
         mesh.animations = [animation]
         mesh.physicsImpostor?.dispose()
         return new Promise<void>((resolve) => {
+            mesh.isVisible = true
             this.scene.beginAnimation(mesh, 0, 10, false, 1, resolve)
         })
     }
@@ -76,7 +82,7 @@ class BehaviorBundle {
                         const pickingInfo = this.scene.pick(
                             this.scene.pointerX,
                             this.scene.pointerY,
-                            (mesh) => this.targetObjArr.some(e => e.mesh === mesh),
+                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
                             false
                         );
                         this.currentPickedMesh = pickingInfo?.pickedMesh || null
@@ -141,7 +147,7 @@ class BehaviorBundle {
                         const pickingInfo = this.scene.pick(
                             this.scene.pointerX,
                             this.scene.pointerY,
-                            (mesh) => this.targetObjArr.some(e => e.mesh === mesh),
+                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
                             false
                         );
                         if (pickingInfo?.pickedMesh && pickingInfo.ray && pickingInfo?.pickedPoint && this.scene.activeCamera) {
@@ -167,7 +173,7 @@ class BehaviorBundle {
                         const pickingInfo = this.scene.pick(
                             this.scene.pointerX,
                             this.scene.pointerY,
-                            (mesh) => this.targetObjArr.some(e => e.mesh === mesh),
+                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
                             false
                         );
                         if (pickingInfo?.pickedMesh && pickingInfo?.pickedPoint) {
@@ -224,15 +230,16 @@ class BehaviorBundle {
         const staticLockPositionInfo: Array<[x: number, y: number, z: number]> = [
             [0, 11, -3], [0, 11, -1], [0, 9, 1], [0, 9, -1], [0, 7, 1], [0, 7, 3],
             [0, 11, -5], [0, 9, -5], [0, 7, -5], [0, 11, 5], [0, 9, 5], [0, 7, 5],
+            [0, 16, 0]
         ]
 
         this.positionLockType = enable ? PositionLockType.Static : PositionLockType.Spring
         if (enable) {
-            this.targetObjArr.forEach((e, index) => {
+            this.behaviorBundleObj.forEach((e, index) => {
                 this.animationMove(e.mesh, {position: staticLockPositionInfo[index], rotation: [0, 0, 0]})
             })
         } else {
-            this.targetObjArr.forEach(e => {
+            this.behaviorBundleObj.forEach(e => {
                 e.usePhysicsImpostor()
             })
         }
@@ -325,14 +332,14 @@ class BehaviorBundle {
                 stickMesh.physicsImpostor.physicsBody.collisionFilterMask = 0
                 stickMesh.position = stickPoint
                 if (stickMesh.physicsImpostor) {
-                    this.targetObjArr[stickPositionCenterIndex].mesh.physicsImpostor?.addJoint(stickMesh.physicsImpostor, physicsJoint)
+                    this.behaviorBundleObj[stickPositionCenterIndex].mesh.physicsImpostor?.addJoint(stickMesh.physicsImpostor, physicsJoint)
                 }
-                if (this.targetObjArr[stickPositionCenterIndex].mesh.physicsImpostor) {
+                if (this.behaviorBundleObj[stickPositionCenterIndex].mesh.physicsImpostor) {
                     // @ts-ignore
-                    this.targetObjArr[stickPositionCenterIndex].mesh.physicsImpostor.friction = 0
+                    this.behaviorBundleObj[stickPositionCenterIndex].mesh.physicsImpostor.friction = 0
                 }
                 this.stickObjArr.push({
-                    mainMesh: this.targetObjArr[stickPositionCenterIndex].mesh,
+                    mainMesh: this.behaviorBundleObj[stickPositionCenterIndex].mesh,
                     pointMesh: stickMesh,
                     joint: physicsJoint
                 })

@@ -1,7 +1,8 @@
 import '@babylonjs/core/Animations/animatable'
 import * as BABYLON from "@babylonjs/core";
+import type {BehaviorBundleObj} from "../util/BehaviorBundle";
 
-class CustomObj {
+class CustomObj implements BehaviorBundleObj {
     scene: BABYLON.Scene
     mesh: BABYLON.Mesh
     options?
@@ -10,8 +11,9 @@ class CustomObj {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
-        this.mesh.scaling = BABYLON.Vector3.Zero()
         this.mesh.isPickable = true
+        this.mesh.isVisible = false
+        this.mesh.scaling = BABYLON.Vector3.Zero()
         this.useMaterial()
     }
 

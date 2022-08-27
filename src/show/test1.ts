@@ -3,7 +3,7 @@ import * as Constant from './util/Constant'
 import * as AssetsImage from '../../src/assets/image'
 import * as BABYLON from '@babylonjs/core';
 import PhysicsStableHelper from "./util/PhysicsStableHelper";
-import BehaviorBundle from "./util/BehaviorBundle"
+import BehaviorBundle, {BehaviorBundleObj} from "./util/BehaviorBundle"
 // import SixPicBox from "./object/SixPicBox";
 
 // 方块配置
@@ -84,8 +84,8 @@ export default async () => {
     new CoordinateLine(scene)
 
     // SixPicBox(scene)
-    const ObjModule = (await import("./object/ObjModule")).default
-    new ObjModule(scene)
+    const ModuleObj = (await import("./object/ModuleObj")).default
+    const moduleObj = new ModuleObj(scene)
 
 
     const SceneBoard = (await import ('./object/SceneBoard')).default
@@ -97,24 +97,25 @@ export default async () => {
     const CustomObj = (await import( './object/CustomObj')).default
 
     // 创建 方块
-    const customObjArr: CustomObj[] = []
+    const behaviorBundleObjs: BehaviorBundleObj[] = []
     customObjOptions.forEach((e) => {
         const box = new CustomObj(scene, e.name, e.option)
         box.mesh.position = new BABYLON.Vector3(...e.initPosition)
-        customObjArr.push(box)
+        behaviorBundleObjs.push(box)
         shadowGenerator.addShadowCaster(box.mesh);
     })
+    behaviorBundleObjs.push(moduleObj)
 
-    const behaviorBundle = new BehaviorBundle(scene, customObjArr)
+    const behaviorBundle = new BehaviorBundle(scene, [...behaviorBundleObjs])
     behaviorBundle.addLockStaticPositionControl()
     behaviorBundle.addNormalPhysicsControl()
     behaviorBundle.addStickPositionControl()
     scene.whenReadyAsync(false).then(() => {
-        customObjArr.forEach((e, index) => {
+        behaviorBundleObjs.forEach((e, index) => {
             setTimeout(() => {
-                behaviorBundle.animateShow(e.mesh).then(() => {
-                    if (index === customObjArr.length - 1) {
-                        customObjArr.forEach(e => {
+                behaviorBundle.animateZoomShow(e).then(() => {
+                    if (index === behaviorBundleObjs.length - 1) {
+                        behaviorBundleObjs.forEach(e => {
                             e.usePhysicsImpostor()
                         })
                         setTimeout(() => {
@@ -138,10 +139,10 @@ export default async () => {
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
-        PhysicsStableHelper.limitMeshPosition([...customObjArr.map(e => e.mesh), FollowMouseObj.getInstance(scene).mesh], sceneSize)
-        PhysicsStableHelper.limitRotateVelocity(customObjArr.map(e => e.mesh))
-        PhysicsStableHelper.limitLinearVelocity(customObjArr.map(e => e.mesh))
-        PhysicsStableHelper.reduceRotateVelocity(customObjArr.slice(0, 6).map(e => e.mesh))
+        PhysicsStableHelper.limitMeshPosition([...behaviorBundleObjs.map(e => e.mesh), FollowMouseObj.getInstance(scene).mesh], sceneSize)
+        PhysicsStableHelper.limitRotateVelocity(behaviorBundleObjs.map(e => e.mesh))
+        PhysicsStableHelper.limitLinearVelocity(behaviorBundleObjs.map(e => e.mesh))
+        PhysicsStableHelper.reduceRotateVelocity(behaviorBundleObjs.slice(0, 6).map(e => e.mesh))
         scene.render();
         stats?.end();
     })

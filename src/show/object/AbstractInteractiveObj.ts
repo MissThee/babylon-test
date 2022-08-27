@@ -1,6 +1,6 @@
 import * as BABYLON from "@babylonjs/core";
 
-abstract class InteractiveCommonObj {
+abstract class AbstractInteractiveObj {
     scene: BABYLON.Scene
     mesh: BABYLON.Mesh
     isLockedPosition: boolean = false
@@ -34,11 +34,10 @@ abstract class InteractiveCommonObj {
             {frame: 0, value: BABYLON.Vector3.Zero()},
             {frame: 10, value: new BABYLON.Vector3(1, 1, 1)},
         ])
-        this.mesh.animations=[animation]
+        this.mesh.animations = [animation]
         this.mesh.physicsImpostor?.dispose()
         return new Promise<void>((resolve) => {
-            this.scene.beginAnimation(this.mesh, 0, 10, false, 1, ()=>{
-
+            this.scene.beginAnimation(this.mesh, 0, 10, false, 1, () => {
                 resolve()
             })
         })
@@ -62,7 +61,7 @@ abstract class InteractiveCommonObj {
             this.mesh.physicsImpostor?.dispose()
             const framePerSecond = 10
             const second = 1.5 // 动画持续总时间
-            this.mesh.animations=[]
+            this.mesh.animations = []
             // 位置变化
             const lockPosition = new BABYLON.Animation("lockPosition", "position", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
             lockPosition.setKeys([
