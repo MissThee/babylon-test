@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core';
-import {Vector2} from "@babylonjs/core";
 
 export default class FollowMouseObj {
     scene: BABYLON.Scene;

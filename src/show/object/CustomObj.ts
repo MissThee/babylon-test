@@ -12,8 +12,8 @@ class CustomObj implements BehaviorBundleObj {
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
         this.mesh.isPickable = true
-        this.mesh.isVisible = false
-        this.mesh.scaling = BABYLON.Vector3.Zero()
+        // this.mesh.isVisible = false
+        // this.mesh.scaling = BABYLON.Vector3.Zero()
         this.useMaterial()
     }
 

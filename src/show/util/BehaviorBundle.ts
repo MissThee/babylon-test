@@ -3,9 +3,13 @@ import '@babylonjs/core/Culling/ray'
 import FollowMouseObj from "./FollowMouseObj";
 import * as Constant from "./Constant";
 import ParticleFlare from "./ParticleFlare";
+import * as AnimationUtil from './Interaction/AnimationUtil'
+import {Nullable} from "@babylonjs/core/types";
+import {PickingInfo} from "@babylonjs/core/Collisions/pickingInfo";
 
 // 全局物体锁定状态
-enum PositionLockType {
+
+enum DraggingType {
     None,
     Static,
     Spring,
@@ -15,86 +19,69 @@ export declare interface BehaviorBundleObj {
     mesh: BABYLON.Mesh,
     usePhysicsImpostor: () => any
     endScaling?: BABYLON.Vector3
-
 }
 
 class BehaviorBundle {
     scene: BABYLON.Scene
-    positionLockType: PositionLockType = PositionLockType.None;
-    followMouseObj: FollowMouseObj;
+    followMouseMesh: BABYLON.Mesh;
     currentPickedMesh: BABYLON.Nullable<BABYLON.AbstractMesh> = null;
-    pointerDownTime: number = 0
-    springDragStartFunc: (() => void) | null = null
-    isSpringDragging: boolean = false
-    currentFollowJoint: BABYLON.Nullable<BABYLON.PhysicsJoint> = null
-    behaviorBundleObj: BehaviorBundleObj[]
+    pointerDownTime: number = 0;
+    springDragStartFunc: BABYLON.Nullable<() => void> = null;
+    currentFollowJoint: BABYLON.Nullable<BABYLON.PhysicsJoint> = null;
+    behaviorBundleObj: BehaviorBundleObj[];
+    draggingType: DraggingType = DraggingType.None;
 
     constructor(scene: BABYLON.Scene, behaviorBundleObj: BehaviorBundleObj[]) {
         this.scene = scene
         this.behaviorBundleObj = behaviorBundleObj
-        this.followMouseObj = FollowMouseObj.getInstance(scene);
-    }
-
-    animateZoomShow(behaviorBundleObj: BehaviorBundleObj) {
-        // return new Promise<void>((resolve) => {
-        //     BABYLON.Animation.CreateAndStartAnimation(
-        //         'showOn',
-        //         this.mesh,
-        //         'scaling',
-        //         60,
-        //         10,
-        //         BABYLON.Vector3.Zero(),
-        //         new BABYLON.Vector3(1, 1, 1),
-        //         BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
-        //         new BABYLON.CubicEase(),
-        //         () => {
-        //             this.usePhysicsImpostor()
-        //             resolve()
-        //         }
-        //     )
-        // })
-        const mesh = behaviorBundleObj.mesh
-        const endScaling = behaviorBundleObj.endScaling || BABYLON.Vector3.One()
-        let animation = new BABYLON.Animation('showOn', 'scaling', 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
-        animation.setKeys([
-            {frame: 0, value: BABYLON.Vector3.Zero()},
-            {frame: 10, value: endScaling},
-        ])
-        mesh.animations = [animation]
-        mesh.physicsImpostor?.dispose()
-        return new Promise<void>((resolve) => {
-            mesh.isVisible = true
-            this.scene.beginAnimation(mesh, 0, 10, false, 1, resolve)
-        })
+        this.followMouseMesh = FollowMouseObj.getInstance(scene).mesh;
     }
 
     addPointerBehavior() {
         // --------------------------鼠标交互-------------------------
         this.scene.onPointerObservable.add((pointerInfo) => {
-            // 物理弹力拖动
-            if (this.positionLockType === PositionLockType.Spring || this.positionLockType === PositionLockType.None) {
+            let pickingInfo: Nullable<PickingInfo> = null
+            switch (pointerInfo.type) {
+                case BABYLON.PointerEventTypes.POINTERUP:
+                case BABYLON.PointerEventTypes.POINTERDOWN:
+                    pickingInfo = this.scene.pick(
+                        this.scene.pointerX,
+                        this.scene.pointerY,
+                        (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
+                        false
+                    );
+            }
+            switch (pointerInfo.type) {
+                case BABYLON.PointerEventTypes.POINTERDOWN:
+                    if (pickingInfo?.pickedMesh) {
+                        if (Constant.canMoveCamera) {
+                            this.scene.activeCamera?.detachControl();
+                        }
+                        if (pickingInfo?.pickedMesh.physicsImpostor && !pickingInfo?.pickedMesh.physicsImpostor.isDisposed) {
+                            this.draggingType = DraggingType.Spring
+                        } else {
+                            this.draggingType = DraggingType.Static
+                        }
+                    } else {
+                        this.draggingType = DraggingType.None
+                    }
+                    if (this.currentPickedMesh?.physicsImpostor && this.followMouseMesh.physicsImpostor && this.currentFollowJoint) {
+                        this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseMesh.physicsImpostor, this.currentFollowJoint)
+                        this.currentFollowJoint = null
+                    }
+            }
+            //------------------------------------------------------------------
+            if (this.draggingType === DraggingType.Spring) {
+                // 物理弹力拖动
                 switch (pointerInfo.type) {
                     case BABYLON.PointerEventTypes.POINTERDOWN:
-                        if (this.currentPickedMesh?.physicsImpostor && this.followMouseObj.mesh.physicsImpostor && this.currentFollowJoint) {
-                            this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseObj.mesh.physicsImpostor, this.currentFollowJoint)
-                            this.isSpringDragging = false
-                        }
-                        const pickingInfo = this.scene.pick(
-                            this.scene.pointerX,
-                            this.scene.pointerY,
-                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
-                            false
-                        );
                         this.currentPickedMesh = pickingInfo?.pickedMesh || null
                         if (this.currentPickedMesh && this.currentPickedMesh.rotationQuaternion && pickingInfo?.pickedPoint) {
-                            if (Constant.canMoveCamera) {
-                                this.scene.activeCamera?.detachControl();
-                            }
                             let mainPivot = pickingInfo.pickedPoint
                                 .subtract(this.currentPickedMesh.getAbsolutePosition()) // 找到点击位置
                                 .applyRotationQuaternion(this.currentPickedMesh.rotationQuaternion.invert()) // 以方块当前旋转角度，调整点击位置
                             // 每次需要创建新的PhysicsJoint，否则使用addJoint使用此joint会一直保持首次关联的物体
-                            this.currentFollowJoint = new BABYLON.PhysicsJoint(
+                            const joint = new BABYLON.PhysicsJoint(
                                 BABYLON.PhysicsJoint.SpringJoint,
                                 {
                                     // @ts-ignore
@@ -103,128 +90,74 @@ class BehaviorBundle {
                                     damping: -Constant.gravity,
                                     collision: false,
                                     // mainAxis:new BABYLON.Vector3(0,-1,0),
-                                    mainPivot: mainPivot, // 方块上的连接点位置
+                                    mainPivot, // 方块上的连接点位置
                                     // connectedPivot:new BABYLON.Vector3(0,0,0), // 鼠标上的连接点位置
                                 }
                             )
                             this.springDragStartFunc = () => {
-                                if (this.isSpringDragging) {
+                                if (this.currentFollowJoint) {
                                     return
                                 }
-                                if (this.followMouseObj.mesh.physicsImpostor && this.currentFollowJoint) {
-                                    this.currentPickedMesh?.physicsImpostor?.addJoint(this.followMouseObj.mesh.physicsImpostor, this.currentFollowJoint)
-                                    this.isSpringDragging = true
+                                this.currentFollowJoint = joint
+                                if (this.followMouseMesh.physicsImpostor) {
+                                    this.currentPickedMesh?.physicsImpostor?.addJoint(this.followMouseMesh.physicsImpostor, this.currentFollowJoint)
                                 }
-
                             }
-
                         }
                         break;
                     case BABYLON.PointerEventTypes.POINTERMOVE:
-                        if (this.currentPickedMesh) {
-                            this.springDragStartFunc?.()
-                        }
+                        this.springDragStartFunc?.()
                         break;
                     case BABYLON.PointerEventTypes.POINTERUP:
-                        if (Constant.canMoveCamera) {
-                            this.scene.activeCamera?.attachControl();
+                        if (this.currentPickedMesh?.physicsImpostor && this.followMouseMesh.physicsImpostor && this.currentFollowJoint) {
+                            this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseMesh.physicsImpostor, this.currentFollowJoint)
+                            this.currentFollowJoint = null
                         }
-                        if (this.currentPickedMesh?.physicsImpostor && this.followMouseObj.mesh.physicsImpostor && this.currentFollowJoint) {
-                            this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseObj.mesh.physicsImpostor, this.currentFollowJoint)
-                            this.isSpringDragging = false
-                        }
-                        this.currentPickedMesh = null
                         break;
                 }
-            }
-            // 物理施加一个点的冲力
-            switch (pointerInfo.type) {
-                case BABYLON.PointerEventTypes.POINTERDOWN:
-                    this.pointerDownTime = performance.now()
-                    break
-                case BABYLON.PointerEventTypes.POINTERUP:
-                    if (performance.now() - this.pointerDownTime < 150) {
-                        const pickingInfo = this.scene.pick(
-                            this.scene.pointerX,
-                            this.scene.pointerY,
-                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
-                            false
-                        );
-                        if (pickingInfo?.pickedMesh && pickingInfo.ray && pickingInfo?.pickedPoint && this.scene.activeCamera) {
-                            pickingInfo.pickedMesh.physicsImpostor?.applyImpulse(pickingInfo.ray.origin.normalize().scale(-15), pickingInfo.pickedPoint)
-                            // 创建 粒子效果
-                            ParticleFlare.getInstance(this.scene).start(pickingInfo.pickedPoint.clone())
-                            // particleFlare.start(
-                            //     //从鼠标方块位置增加距离
-                            //     this.followMouseObj.mesh.position.clone()
-                            //         .add(
-                            //             //增加从点击位置方块到摄像机视窗鼠标位置
-                            //             this.scene.activeCamera.position.subtract(pickingInfo.pickedPoint).normalize().scale(Constant.sceneDeep)
-                            //         )
-                            // )
-                        }
-                    }
-                    break
-            }
-            // 静态拖动
-            if (this.positionLockType === PositionLockType.Static) {
+                // 物理施加一个点的冲力
                 switch (pointerInfo.type) {
                     case BABYLON.PointerEventTypes.POINTERDOWN:
-                        const pickingInfo = this.scene.pick(
-                            this.scene.pointerX,
-                            this.scene.pointerY,
-                            (mesh) => this.behaviorBundleObj.some(e => e.mesh === mesh),
-                            false
-                        );
+                        this.pointerDownTime = performance.now()
+                        break
+                    case BABYLON.PointerEventTypes.POINTERUP:
+                        if (performance.now() - this.pointerDownTime < 150) {
+                            if (pickingInfo?.pickedMesh && pickingInfo.ray && pickingInfo?.pickedPoint && this.scene.activeCamera) {
+                                pickingInfo.pickedMesh.physicsImpostor?.applyImpulse(pickingInfo.ray.origin.normalize().scale(-15), pickingInfo.pickedPoint)
+                                // 创建 粒子效果
+                                ParticleFlare.getInstance(this.scene).start(pickingInfo.pickedPoint.clone())
+                            }
+                        }
+                        break
+                }
+            } else if (this.draggingType === DraggingType.Static) {
+                // 静态拖动
+                switch (pointerInfo.type) {
+                    case BABYLON.PointerEventTypes.POINTERDOWN:
                         if (pickingInfo?.pickedMesh && pickingInfo?.pickedPoint) {
                             this.currentPickedMesh = pickingInfo?.pickedMesh
-                            if (Constant.canMoveCamera) {
-                                this.scene.activeCamera?.detachControl();
-                            }
                         }
                         break;
                     case  BABYLON.PointerEventTypes.POINTERMOVE:
                         if (this.currentPickedMesh) {
-                            this.currentPickedMesh.position = this.followMouseObj.mesh.position.clone()
-                        }
-                        break;
-                    case BABYLON.PointerEventTypes.POINTERUP:
-                        this.currentPickedMesh = null
-                        if (Constant.canMoveCamera) {
-                            this.scene.activeCamera?.attachControl();
+                            this.currentPickedMesh.position = this.followMouseMesh.position.clone()
                         }
                         break;
                 }
+            }
+            //------------------------------------------------------------------
+            switch (pointerInfo.type) {
+                case BABYLON.PointerEventTypes.POINTERUP:
+                    this.draggingType = DraggingType.None
+                    this.currentPickedMesh = null
+                    if (Constant.canMoveCamera) {
+                        this.scene.activeCamera?.attachControl();
+                    }
             }
         })
     }
 
     // ------------------------固定静态位置------------------------
-    private animationMove(mesh: BABYLON.Mesh, param?: { position?: [x: number, y: number, z: number], rotation?: [x: number, y: number, z: number] }) {
-        if (!!param) {
-            // 绑定物理效果后不能执行动画，需要先清除物理效果
-            mesh.physicsImpostor?.dispose()
-            const framePerSecond = 10
-            const second = 1.5 // 动画持续总时间
-            mesh.animations = []
-            // 位置变化
-            const lockPosition = new BABYLON.Animation("lockPosition", "position", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
-            lockPosition.setKeys([
-                {frame: 0, value: mesh.position},
-                {frame: framePerSecond * second, value: new BABYLON.Vector3(...(param?.position || []))},
-            ]);
-            mesh.animations.push(lockPosition)
-            // 角度变化
-            const lockRotation = new BABYLON.Animation("lockRotation", "rotation", framePerSecond, BABYLON.Animation.ANIMATIONTYPE_VECTOR3);
-            lockRotation.setKeys([
-                {frame: 0, value: mesh.rotation},
-                {frame: framePerSecond * second, value: new BABYLON.Vector3(...(param?.rotation || []))},
-            ]);
-            mesh.animations.push(lockRotation)
-            // 执行动画
-            this.scene.beginAnimation(mesh, 0, framePerSecond * second, false, 4);
-        }
-    }
 
     staticLock = (enable: boolean) => {
         const staticLockPositionInfo: Array<[x: number, y: number, z: number]> = [
@@ -233,10 +166,9 @@ class BehaviorBundle {
             [0, 16, 0]
         ]
 
-        this.positionLockType = enable ? PositionLockType.Static : PositionLockType.Spring
         if (enable) {
             this.behaviorBundleObj.forEach((e, index) => {
-                this.animationMove(e.mesh, {position: staticLockPositionInfo[index], rotation: [0, 0, 0]})
+                AnimationUtil.animationMove(e.mesh, {position: new BABYLON.Vector3(...staticLockPositionInfo[index]), rotation: BABYLON.Vector3.Zero()})
             })
         } else {
             this.behaviorBundleObj.forEach(e => {
@@ -259,7 +191,6 @@ class BehaviorBundle {
     // ------------------------固定弹力位置------------------------
     stickObjArr: { mainMesh: BABYLON.Mesh, pointMesh: BABYLON.Mesh, joint: BABYLON.PhysicsJoint }[] = []
     stickPosition = (enable: boolean) => {
-        this.positionLockType = enable ? PositionLockType.Spring : PositionLockType.Spring
         this.stickObjArr.forEach(stickObj => {
             if (stickObj.mainMesh.physicsImpostor && stickObj.pointMesh.physicsImpostor && stickObj.joint) {
                 this.scene.getPhysicsEngine()?.removeJoint(stickObj.mainMesh.physicsImpostor, stickObj.pointMesh.physicsImpostor, stickObj.joint)

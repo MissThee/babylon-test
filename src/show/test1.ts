@@ -4,6 +4,7 @@ import * as AssetsImage from '../../src/assets/image'
 import * as BABYLON from '@babylonjs/core';
 import PhysicsStableHelper from "./util/PhysicsStableHelper";
 import BehaviorBundle, {BehaviorBundleObj} from "./util/BehaviorBundle"
+import * as AnimationUtil from "./util/Interaction/AnimationUtil";
 // import SixPicBox from "./object/SixPicBox";
 
 // 方块配置
@@ -87,6 +88,8 @@ export default async () => {
     const ModuleObj = (await import("./object/ModuleObj")).default
     const moduleObj = new ModuleObj(scene)
 
+    const ModuleBoxObj = (await import("./object/ModuleBoxObj")).default
+    new ModuleBoxObj(scene)
 
     const SceneBoard = (await import ('./object/SceneBoard')).default
     new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
@@ -113,17 +116,18 @@ export default async () => {
     scene.whenReadyAsync(false).then(() => {
         behaviorBundleObjs.forEach((e, index) => {
             setTimeout(() => {
-                behaviorBundle.animateZoomShow(e).then(() => {
-                    if (index === behaviorBundleObjs.length - 1) {
-                        behaviorBundleObjs.forEach(e => {
-                            e.usePhysicsImpostor()
-                        })
-                        setTimeout(() => {
-                            // 创建 可交互对象，添加交互动作。粒子点击交互动作
-                            behaviorBundle.addPointerBehavior()
-                        }, 2000)
-                    }
-                })
+                AnimationUtil.animationZoomShow(e.mesh)
+                    .then(() => {
+                        if (index === behaviorBundleObjs.length - 1) {
+                            behaviorBundleObjs.forEach(e => {
+                                e.usePhysicsImpostor()
+                            })
+                            setTimeout(() => {
+                                // 创建 可交互对象，添加交互动作。粒子点击交互动作
+                                behaviorBundle.addPointerBehavior()
+                            }, 2000)
+                        }
+                    })
             }, index * 100)
         })
     })
@@ -146,6 +150,7 @@ export default async () => {
         scene.render();
         stats?.end();
     })
+
     // 适应尺寸
     window.addEventListener('resize', () => {
         engine.resize();
