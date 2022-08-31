@@ -9,23 +9,23 @@ abstract class PhysicsStableHelper {
                 mesh.position.x = option.deep / 2 - option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }
-            if (mesh.position.x < -option.deep / 2 + option.safePadding) {
+            if (mesh.position.x <= -option.deep / 2 + option.safePadding) {
                 mesh.position.x = -option.deep / 2 + option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }
-            if (mesh.position.z > option.width / 2 - option.safePadding) {
+            if (mesh.position.z >= option.width / 2 - option.safePadding) {
                 mesh.position.z = option.width / 2 - option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }
-            if (mesh.position.z < -option.width / 2 + option.safePadding) {
+            if (mesh.position.z <= -option.width / 2 + option.safePadding) {
                 mesh.position.z = -option.width / 2 + option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }
-            if (mesh.position.y > option.width - option.safePadding) {
-                mesh.position.y = option.width - option.safePadding
+            if (mesh.position.y >= option.height - option.safePadding) {
+                mesh.position.y = option.height - option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }
-            if (mesh.position.y < option.safePadding) {
+            if (mesh.position.y <= option.safePadding) {
                 mesh.position.y = option.safePadding
                 mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
             }

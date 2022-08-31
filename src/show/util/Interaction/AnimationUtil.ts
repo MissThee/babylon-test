@@ -1,18 +1,21 @@
 import * as BABYLON from "@babylonjs/core";
 
-export const animationZoomShow = (mesh: BABYLON.Mesh) => {
+export const animationZoomShow = (mesh: BABYLON.Mesh, forceScaling?: BABYLON.Vector3) => {
     const meshScaling = mesh.scaling
     mesh.physicsImpostor?.dispose()
+    mesh.physicsImpostor = null
     mesh.scaling = BABYLON.Vector3.Zero()
+    const framePerSecond = 60
+    const second = 1 // 0.3 // 动画持续总时间
     return new Promise<void>((resolve) => {
         BABYLON.Animation.CreateAndStartAnimation(
             'zoomShow',
             mesh,
             'scaling',
-            60,
-            10,
+            framePerSecond,
+            framePerSecond * second,
             BABYLON.Vector3.Zero(),
-            meshScaling,
+            forceScaling || meshScaling,
             BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
             new BABYLON.CubicEase(),
             () => {
@@ -37,11 +40,10 @@ export const animationZoomShow = (mesh: BABYLON.Mesh) => {
     //     this.scene.beginAnimation(mesh, 0, 10, false, 1, resolve)
     // })
 }
-
-
 export const animationMove = (mesh: BABYLON.Mesh, param: { position?: BABYLON.Vector3, rotation?: BABYLON.Vector3 }) => {
     // 绑定物理效果后不能执行动画，需要先清除物理效果
     mesh.physicsImpostor?.dispose()
+    mesh.physicsImpostor = null
     const framePerSecond = 60
     const second = 0.3 // 动画持续总时间
 

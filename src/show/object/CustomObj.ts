@@ -1,13 +1,15 @@
 import '@babylonjs/core/Animations/animatable'
 import * as BABYLON from "@babylonjs/core";
-import type {BehaviorBundleObj} from "../util/BehaviorBundle";
+import type {StickObject} from "../util/Interaction/StickHelper";
 
-class CustomObj implements BehaviorBundleObj {
-    scene: BABYLON.Scene
+class CustomObj implements StickObject {
+    scene?: BABYLON.Scene
     mesh: BABYLON.Mesh
+    springStickPosition?: BABYLON.Vector3
+    staticStickPosition?: BABYLON.Vector3
     options?
 
-    constructor(scene: BABYLON.Scene, name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }) {
+    constructor(name: string = 'CustomObj', options?: { materialOpt?: { textureUrl?: string; } }, scene?: BABYLON.Scene) {
         this.options = options
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
@@ -31,7 +33,7 @@ class CustomObj implements BehaviorBundleObj {
     }
 
     usePhysicsImpostor() {
-        if (this.mesh.physicsImpostor && !this.mesh.physicsImpostor.isDisposed) {
+        if (this.mesh.physicsImpostor) {
             return
         }
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {

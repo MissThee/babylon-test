@@ -36,6 +36,7 @@ abstract class AbstractInteractiveObj {
         ])
         this.mesh.animations = [animation]
         this.mesh.physicsImpostor?.dispose()
+        this.mesh.physicsImpostor=null
         return new Promise<void>((resolve) => {
             this.scene.beginAnimation(this.mesh, 0, 10, false, 1, () => {
                 resolve()
@@ -44,7 +45,7 @@ abstract class AbstractInteractiveObj {
     }
 
     usePhysicsImpostor() {
-        if (this.mesh.physicsImpostor && !this.mesh.physicsImpostor.isDisposed) {
+        if (this.mesh.physicsImpostor) {
             return
         }
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
@@ -59,6 +60,7 @@ abstract class AbstractInteractiveObj {
         if (this.isLockedPosition) {
             // 绑定物理效果后不能执行动画，需要先清除物理效果
             this.mesh.physicsImpostor?.dispose()
+            this.mesh.physicsImpostor=null
             const framePerSecond = 10
             const second = 1.5 // 动画持续总时间
             this.mesh.animations = []

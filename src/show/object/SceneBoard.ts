@@ -85,7 +85,7 @@ export default class SceneBoard {
         }
 
         {
-            // 场景背部背景板
+            // 场景背部挡板
             let wallBack = BABYLON.MeshBuilder.CreatePlane('wallBack', {
                 width: this.sideVerticalLength, // x轴方向宽度
                 height: this.sideHorizontalLength, // y轴方向宽度
@@ -110,7 +110,7 @@ export default class SceneBoard {
         }
 
         {
-            // 场景限制物体前方透明板
+            // 场景限制物体前方挡板
             let wallLimit = BABYLON.MeshBuilder.CreatePlane('wallLimit', {
                 width: this.sideVerticalLength, // x轴方向宽度
                 height: this.sideHorizontalLength, // y轴方向宽度
@@ -133,7 +133,7 @@ export default class SceneBoard {
         }
 
         {
-            // 场景限制物体上部的透明板
+            // 场景限制物体上部的挡板
             let wallLimitTop = BABYLON.MeshBuilder.CreatePlane('wallLimitTop', {
                 width: this.deepLength, // x轴方向宽度
                 height: this.sideVerticalLength, // y轴方向宽度

@@ -1,29 +1,18 @@
-import type CustomObj from './object/CustomObj'
 import * as Constant from './util/Constant'
 import * as AssetsImage from '../../src/assets/image'
 import * as BABYLON from '@babylonjs/core';
 import PhysicsStableHelper from "./util/PhysicsStableHelper";
-import BehaviorBundle, {BehaviorBundleObj} from "./util/BehaviorBundle"
+import StickHelper, {StickObject} from "./util/Interaction/StickHelper"
 import * as AnimationUtil from "./util/Interaction/AnimationUtil";
+import DragHelper from "./util/Interaction/DragHelper";
+import moduleDiscObj from "./object/ModuleDiscObj";
 // import SixPicBox from "./object/SixPicBox";
 
-// 方块配置
-const customObjOptions = [
-    {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 16, -12]},
-    {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 14, -9]},
-    {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 12, -6]},
-    {name: "textBoxBlue4", option: {materialOpt: {textureUrl: AssetsImage.sideBlue4}}, initPosition: [0, 10, -3]},
-    {name: "textBoxBlue5", option: {materialOpt: {textureUrl: AssetsImage.sideBlue5}}, initPosition: [0, 12, 0]},
-    {name: "textBoxBlue6", option: {materialOpt: {textureUrl: AssetsImage.sideBlue6}}, initPosition: [0, 14, 3]},
-    {name: "textBoxOrange1", option: {materialOpt: {textureUrl: AssetsImage.sideOrange1}}, initPosition: [0, 10, 6]},
-    {name: "textBoxOrange2", option: {materialOpt: {textureUrl: AssetsImage.sideOrange2}}, initPosition: [0, 13, 6]},
-    {name: "textBoxOrange3", option: {materialOpt: {textureUrl: AssetsImage.sideOrange3}}, initPosition: [0, 16, 6]},
-    {name: "textBoxOrange4", option: {materialOpt: {textureUrl: AssetsImage.sideOrange4}}, initPosition: [0, 19, 9]},
-    {name: "textBoxOrange5", option: {materialOpt: {textureUrl: AssetsImage.sideOrange5}}, initPosition: [0, 16, 9]},
-    {name: "textBoxOrange6", option: {materialOpt: {textureUrl: AssetsImage.sideOrange6}}, initPosition: [0, 13, 9]},
-]
+
+const timeout = (sleepTime: number) => new Promise((resolve) => setTimeout(resolve, sleepTime))
 
 export default async () => {
+    // 创建 画布
     const canvasEl = document.createElement('canvas');
     canvasEl.style.userSelect = 'none'
     canvasEl.style.width = '100%'
@@ -39,7 +28,6 @@ export default async () => {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
     scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
-
     // 添加 物理引擎
     const cannon = await import('cannon')
     await import('@babylonjs/core/Physics/physicsEngineComponent')
@@ -57,18 +45,12 @@ export default async () => {
         0,
         0.5 * Math.PI,
         Constant.sceneDeep / 2 + Constant.cameraDistanceFix + Constant.cameraDistance,
-        new BABYLON.Vector3(
-            0,
-            sceneSize.height / 2,
-            0
-        ),
+        new BABYLON.Vector3(0, sceneSize.height / 2, 0),
         scene
     )
     camera.fov = Constant.cameraFov
     camera.lowerRadiusLimit = 2
-    if (Constant.canMoveCamera) {
-        camera.attachControl(scene.getEngine().getRenderingCanvas(), false)
-    }
+    Constant.canMoveCamera && camera.attachControl(scene.getEngine().getRenderingCanvas(), false)
 
     // 创建 光源
     const Light1 = (await import("./light/Light1")).default
@@ -76,61 +58,112 @@ export default async () => {
     // const Light2 = (await import("./light/Light2")).default
     // const light2 = new Light2(scene)
 
+    // 创建 影子生成器
+    await import ('@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent')
+    const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
+
     // 创建 点击声音
     import("./sound/ClickSound").then(value => {
         new value.default(scene)
     })
-
-    const CoordinateLine = (await import("./util/CoordinateLine")).default
-    new CoordinateLine(scene)
-
+    //------------------------------------------------------------------------------------------------------------
     // SixPicBox(scene)
-    const ModuleObj = (await import("./object/ModuleObj")).default
-    const moduleObj = new ModuleObj(scene)
 
-    const ModuleBoxObj = (await import("./object/ModuleBoxObj")).default
-    new ModuleBoxObj(scene)
+    // 创建 基础参考坐标
+    // const CoordinateLine = (await import("./util/CoordinateLine")).default
+    // new CoordinateLine(scene)
 
+    // 创建 鼠标映射位置物体
+    const FollowMouseObj = (await import( "./util/FollowMouseObj")).default;
+    const followMouseObj = FollowMouseObj.getInstance(scene).mesh
+    // 创建 场景板
     const SceneBoard = (await import ('./object/SceneBoard')).default
     new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
 
-    // 创建 影子生成器
-    await import ('@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent')
-    const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
-    const CustomObj = (await import( './object/CustomObj')).default
+    const interactiveObjs: StickObject[] = [] // 交互对象
+    const scalingTmpArr: BABYLON.Vector3[] = [] // 交互对象初始缩放值
+
+    // test
+    // const LetterObj = (await import('./object/LetterObj')).default
+    // new LetterObj("A", scene)
 
     // 创建 方块
-    const behaviorBundleObjs: BehaviorBundleObj[] = []
-    customObjOptions.forEach((e) => {
-        const box = new CustomObj(scene, e.name, e.option)
-        box.mesh.position = new BABYLON.Vector3(...e.initPosition)
-        behaviorBundleObjs.push(box)
-        shadowGenerator.addShadowCaster(box.mesh);
-    })
-    behaviorBundleObjs.push(moduleObj)
+    const customObjOptions = [
+        {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 15, -12], staticStickPosition: [0, 11, -3], springStickPosition: [0, 12, -6]},
+        {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 13, -9], staticStickPosition: [0, 11, -1], springStickPosition: [0, 12, 0]},
+        {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 11, -6], staticStickPosition: [0, 9, 1], springStickPosition: [0, 12, 6]},
+        {name: "textBoxBlue4", option: {materialOpt: {textureUrl: AssetsImage.sideBlue4}}, initPosition: [0, 9, -3], staticStickPosition: [0, 9, -1], springStickPosition: [0, 8, -4]},
+        {name: "textBoxBlue5", option: {materialOpt: {textureUrl: AssetsImage.sideBlue5}}, initPosition: [0, 11, 0], staticStickPosition: [0, 7, 1], springStickPosition: [0, 8, 4]},
+        {name: "textBoxBlue6", option: {materialOpt: {textureUrl: AssetsImage.sideBlue6}}, initPosition: [0, 13, 3], staticStickPosition: [0, 7, 3], springStickPosition: [0, 4, 0]},
+        {name: "textBoxOrange1", option: {materialOpt: {textureUrl: AssetsImage.sideOrange1}}, initPosition: [0, 10, 6], staticStickPosition: [0, 11, -5]},
+        {name: "textBoxOrange2", option: {materialOpt: {textureUrl: AssetsImage.sideOrange2}}, initPosition: [0, 13, 6], staticStickPosition: [0, 9, -5]},
+        {name: "textBoxOrange3", option: {materialOpt: {textureUrl: AssetsImage.sideOrange3}}, initPosition: [0, 16, 6], staticStickPosition: [0, 7, -5]},
+        {name: "textBoxOrange4", option: {materialOpt: {textureUrl: AssetsImage.sideOrange4}}, initPosition: [0, 19, 9], staticStickPosition: [0, 11, 5]},
+        {name: "textBoxOrange5", option: {materialOpt: {textureUrl: AssetsImage.sideOrange5}}, initPosition: [0, 16, 9], staticStickPosition: [0, 9, 5]},
+        {name: "textBoxOrange6", option: {materialOpt: {textureUrl: AssetsImage.sideOrange6}}, initPosition: [0, 13, 9], staticStickPosition: [0, 7, 5]},
+    ]
+    const CustomObj = (await import( './object/CustomObj')).default
+    interactiveObjs.push(...customObjOptions.map((e) => {
+        const box = new CustomObj(e.name, e.option, scene)
+        e.staticStickPosition && (box.staticStickPosition = new BABYLON.Vector3(...e.staticStickPosition));
+        e.springStickPosition && (box.springStickPosition = new BABYLON.Vector3(...e.springStickPosition));
+        e.initPosition && (box.mesh.position = new BABYLON.Vector3(...e.initPosition))
+        scalingTmpArr.push(box.mesh.scaling.clone())
+        box.mesh.scaling = BABYLON.Vector3.Zero()
+        return box
+    }))
 
-    const behaviorBundle = new BehaviorBundle(scene, [...behaviorBundleObjs])
-    behaviorBundle.addLockStaticPositionControl()
-    behaviorBundle.addNormalPhysicsControl()
-    behaviorBundle.addStickPositionControl()
-    scene.whenReadyAsync(false).then(() => {
-        behaviorBundleObjs.forEach((e, index) => {
-            setTimeout(() => {
-                AnimationUtil.animationZoomShow(e.mesh)
-                    .then(() => {
-                        if (index === behaviorBundleObjs.length - 1) {
-                            behaviorBundleObjs.forEach(e => {
-                                e.usePhysicsImpostor()
-                            })
-                            setTimeout(() => {
-                                // 创建 可交互对象，添加交互动作。粒子点击交互动作
-                                behaviorBundle.addPointerBehavior()
-                            }, 2000)
-                        }
-                    })
-            }, index * 100)
-        })
+    // 创建 包裹模型物体
+    const ModuleObj = (await import("./object/ModuleObj")).default
+    const moduleObj = new ModuleObj(scene)
+    moduleObj.staticStickPosition = new BABYLON.Vector3(0, 15, 0)
+    interactiveObjs.push(moduleObj)
+    const moduleObjPromise = moduleObj.modulePromise.then(() => {
+        scalingTmpArr.push(moduleObj.mesh.scaling.clone())
+        moduleObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
+
+    // 创建 细节碰撞模型物体
+    const ModuleDiscObj = (await import("./object/ModuleDiscObj")).default
+    const moduleDiscObj = new ModuleDiscObj('A', scene)
+    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 15, 10)
+    moduleDiscObj.springStickPosition = new BABYLON.Vector3(0, 15, -10)
+    interactiveObjs.push(moduleDiscObj)
+    const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
+        scalingTmpArr.push(moduleDiscObj.mesh.scaling.clone())
+        moduleDiscObj.mesh.scaling = BABYLON.Vector3.Zero()
+    })
+
+    let isEnableObjectPositionLimit = false
+    // 初始化内容
+    scene
+        .whenReadyAsync(false)
+        .then(async () => {
+            await moduleObjPromise
+            await moduleDiscObjPromise
+            interactiveObjs.forEach(e => {
+                shadowGenerator.addShadowCaster(e.mesh); // 生成影子。自动包含children
+            })
+            const lastIndex = interactiveObjs.length - 1
+            for (let index = 0; index < lastIndex; index++) {
+                const interactiveObj = interactiveObjs[index]
+                await timeout(100)
+                AnimationUtil.animationZoomShow(interactiveObj.mesh, scalingTmpArr[index])
+            }
+            await timeout(100)
+            await AnimationUtil.animationZoomShow(interactiveObjs[lastIndex].mesh, scalingTmpArr[lastIndex])
+            scalingTmpArr.length = 0
+        })
+        .then(() => {
+            isEnableObjectPositionLimit = true
+            interactiveObjs.forEach(e => e.usePhysicsImpostor())
+            // 增加 鼠标物体交互、粒子效果
+            new DragHelper(scene, [...interactiveObjs.map(e => e.mesh), ...moduleDiscObj.subPhysicMeshes], true)
+            // 增加 钉住物体交互
+            const stickHelper = new StickHelper(scene, interactiveObjs)
+            stickHelper.addTestButton()
+        })
+
 
     // 性能监测
     let stats: Stats;
@@ -138,15 +171,16 @@ export default async () => {
         stats = new value.default()
         document.body.appendChild(stats.dom)
     })
-    const FollowMouseObj = (await import( "./util/FollowMouseObj")).default;
 
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
-        PhysicsStableHelper.limitMeshPosition([...behaviorBundleObjs.map(e => e.mesh), FollowMouseObj.getInstance(scene).mesh], sceneSize)
-        PhysicsStableHelper.limitRotateVelocity(behaviorBundleObjs.map(e => e.mesh))
-        PhysicsStableHelper.limitLinearVelocity(behaviorBundleObjs.map(e => e.mesh))
-        PhysicsStableHelper.reduceRotateVelocity(behaviorBundleObjs.slice(0, 6).map(e => e.mesh))
+        if (isEnableObjectPositionLimit) {
+            PhysicsStableHelper.limitMeshPosition(followMouseObj, sceneSize)
+            PhysicsStableHelper.limitRotateVelocity(interactiveObjs.map(e => e.mesh))
+            PhysicsStableHelper.limitLinearVelocity(interactiveObjs.map(e => e.mesh))
+            PhysicsStableHelper.reduceRotateVelocity([...interactiveObjs.slice(0, 6), ...interactiveObjs.slice(12)].map(e => e.mesh))
+        }
         scene.render();
         stats?.end();
     })
@@ -155,4 +189,6 @@ export default async () => {
     window.addEventListener('resize', () => {
         engine.resize();
     })
+
+
 }
