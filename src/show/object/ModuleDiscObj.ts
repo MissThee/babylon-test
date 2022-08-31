@@ -16,7 +16,7 @@ class ModuleDiscObj implements StickObject {
 
     constructor(letter: string, scene?: BABYLON.Scene) {
         this.scene = scene;
-        const position = {x: 0, y: 16, z: -5}
+        const position = {x: 0, y: 0, z: 0}
 
         this.mesh = new BABYLON.Mesh('wrapperMesh', this.scene) // BABYLON.MeshBuilder.CreateBox('', {size: 0.5}) //
         this.mesh.isVisible = false
@@ -37,6 +37,7 @@ class ModuleDiscObj implements StickObject {
                 const m = container.meshes[1]
                 this.shadowMesh = m
                 m.name = 'letter-' + letter
+                m.receiveShadows = true
                 if (m.material) {
                     (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
                     (m.material as BABYLON.StandardMaterial).specularColor = BABYLON.Color3.Black();
@@ -56,7 +57,7 @@ class ModuleDiscObj implements StickObject {
             return
         }
         this.subPhysicMeshes.forEach(e => e.physicsImpostor = new BABYLON.PhysicsImpostor(e, BABYLON.PhysicsImpostor.BoxImpostor))
-        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {mass: 3, friction: 1, restitution: 0}, this.scene)
+        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.NoImpostor, {mass: 1, friction: 1, restitution: 0}, this.scene)
     }
 
     buildSubMesh(letter: string) {

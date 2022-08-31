@@ -10,7 +10,7 @@ export declare interface StickObject {
     mesh: BABYLON.Mesh,
     springStickPosition?: BABYLON.Vector3
     staticStickPosition?: BABYLON.Vector3
-    usePhysicsImpostor: () => any
+    usePhysicsImpostor: () => void
 }
 
 export declare interface SpringStickInfo {

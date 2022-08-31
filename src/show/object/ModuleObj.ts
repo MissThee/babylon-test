@@ -12,7 +12,7 @@ class ModuleObj implements StickObject {
     modulePromise: Promise<void | ISceneLoaderAsyncResult>
 
     constructor(scene?: BABYLON.Scene) {
-        const position = {x: 0, y: 5, z: 5}
+        const position = {x: 0, y: 0, z: 0}
         this.scene = scene;
         this.mesh = BABYLON.MeshBuilder.CreateSphere('moduleObj', {}, this.scene)
         // this.mesh.isVisible = false
@@ -41,12 +41,7 @@ class ModuleObj implements StickObject {
         if (this.mesh.physicsImpostor) {
             return
         }
-        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-            this.mesh,
-            BABYLON.PhysicsImpostor.SphereImpostor,
-            {mass: 1, friction: 1, restitution: 0},
-            this.scene
-        );
+        this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.SphereImpostor, {mass: 1, friction: 1, restitution: 0}, this.scene);
     }
 }
 

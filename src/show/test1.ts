@@ -80,13 +80,37 @@ export default async () => {
     const SceneBoard = (await import ('./object/SceneBoard')).default
     new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
 
-    const interactiveObjs: StickObject[] = [] // 交互对象
+    const interactiveObjs: (StickObject & { subPhysicMeshes?: BABYLON.Mesh[] })[] = [] // 交互对象
     const scalingTmpArr: BABYLON.Vector3[] = [] // 交互对象初始缩放值
 
-    // test
-    // const LetterObj = (await import('./object/LetterObj')).default
-    // new LetterObj("A", scene)
-
+    // 创建 组合字母
+    {
+        const LetterObj = (await import('./object/LetterObj')).default
+        const letterObj = new LetterObj("A", scene)
+        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 8, -16)
+        interactiveObjs.push(letterObj)
+        scalingTmpArr.push(letterObj.mesh.scaling.clone())
+        letterObj.mesh.scaling = BABYLON.Vector3.Zero()
+    }
+    {
+        const LetterObj = (await import('./object/LetterObj')).default
+        const letterObj = new LetterObj("B", scene)
+        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 12, -6)
+        interactiveObjs.push(letterObj)
+        scalingTmpArr.push(letterObj.mesh.scaling.clone())
+        letterObj.mesh.scaling = BABYLON.Vector3.Zero()
+    }
+    {
+        const LetterObj = (await import('./object/LetterObj')).default
+        const letterObj = new LetterObj("C", scene)
+        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 3)
+        interactiveObjs.push(letterObj)
+        scalingTmpArr.push(letterObj.mesh.scaling.clone())
+        letterObj.mesh.scaling = BABYLON.Vector3.Zero()
+    }
     // 创建 方块
     const customObjOptions = [
         {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 15, -12], staticStickPosition: [0, 11, -3], springStickPosition: [0, 12, -6]},
@@ -119,6 +143,7 @@ export default async () => {
     moduleObj.staticStickPosition = new BABYLON.Vector3(0, 15, 0)
     interactiveObjs.push(moduleObj)
     const moduleObjPromise = moduleObj.modulePromise.then(() => {
+        moduleObj.mesh.position = new BABYLON.Vector3(0, 5, 5)
         scalingTmpArr.push(moduleObj.mesh.scaling.clone())
         moduleObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
@@ -130,6 +155,7 @@ export default async () => {
     moduleDiscObj.springStickPosition = new BABYLON.Vector3(0, 15, -10)
     interactiveObjs.push(moduleDiscObj)
     const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
+        moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 16, -5)
         scalingTmpArr.push(moduleDiscObj.mesh.scaling.clone())
         moduleDiscObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
@@ -158,7 +184,7 @@ export default async () => {
             isEnableObjectPositionLimit = true
             interactiveObjs.forEach(e => e.usePhysicsImpostor())
             // 增加 鼠标物体交互、粒子效果
-            new DragHelper(scene, [...interactiveObjs.map(e => e.mesh), ...moduleDiscObj.subPhysicMeshes], true)
+            new DragHelper(scene, interactiveObjs.flatMap(e => [e.mesh, ...(e.subPhysicMeshes || [])]), true)
             // 增加 钉住物体交互
             const stickHelper = new StickHelper(scene, interactiveObjs)
             stickHelper.addTestButton()

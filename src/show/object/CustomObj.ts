@@ -14,6 +14,7 @@ class CustomObj implements StickObject {
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateBox(name, {size: 2}, this.scene);
         this.mesh.isPickable = true
+        this.mesh.receiveShadows = true
         // this.mesh.isVisible = false
         // this.mesh.scaling = BABYLON.Vector3.Zero()
         this.useMaterial()
@@ -26,7 +27,7 @@ class CustomObj implements StickObject {
         if (this.options?.materialOpt?.textureUrl) {
             const material = new BABYLON.StandardMaterial("textMaterial", this.scene);
             material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
-            material.emissiveColor = new BABYLON.Color3(1, 1, 1)
+            material.emissiveColor = BABYLON.Color3.White().scale(0.95)
             material.specularColor = BABYLON.Color3.Black()
             this.mesh.material = material;
         }

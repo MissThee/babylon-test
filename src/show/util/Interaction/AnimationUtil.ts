@@ -6,7 +6,7 @@ export const animationZoomShow = (mesh: BABYLON.Mesh, forceScaling?: BABYLON.Vec
     mesh.physicsImpostor = null
     mesh.scaling = BABYLON.Vector3.Zero()
     const framePerSecond = 60
-    const second = 1 // 0.3 // 动画持续总时间
+    const second = 0.3 // 动画持续总时间
     return new Promise<void>((resolve) => {
         BABYLON.Animation.CreateAndStartAnimation(
             'zoomShow',
