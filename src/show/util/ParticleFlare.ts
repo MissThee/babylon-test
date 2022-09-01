@@ -1,6 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
 import * as AssetsImage from '../../../src/assets/image'
-import {Quaternion} from "@babylonjs/core/Maths/math.vector";
 
 class ParticleFlare {
     scene: BABYLON.Scene

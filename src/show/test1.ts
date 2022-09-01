@@ -5,9 +5,7 @@ import PhysicsStableHelper from "./util/PhysicsStableHelper";
 import StickHelper, {StickObject} from "./util/Interaction/StickHelper"
 import * as AnimationUtil from "./util/Interaction/AnimationUtil";
 import DragHelper from "./util/Interaction/DragHelper";
-import moduleDiscObj from "./object/ModuleDiscObj";
-// import SixPicBox from "./object/SixPicBox";
-
+import './util/RefreshAfterResize'
 
 const timeout = (sleepTime: number) => new Promise((resolve) => setTimeout(resolve, sleepTime))
 
@@ -55,18 +53,21 @@ export default async () => {
     // 创建 光源
     const Light1 = (await import("./light/Light1")).default
     const light1 = new Light1(scene)
-    // const Light2 = (await import("./light/Light2")).default
-    // const light2 = new Light2(scene)
+    // 创建 光源
+    const Light2 = (await import("./light/Light2")).default
+    const light2 = new Light2(scene)
 
     // 创建 影子生成器
     await import ('@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent')
     const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
 
     // 创建 点击声音
-    import("./sound/ClickSound").then(value => {
-        new value.default(scene)
-    })
+    const ClickSound = (await import("./sound/ClickSound")).default
+    new ClickSound(scene)
+
     //------------------------------------------------------------------------------------------------------------
+
+    // const SixPicBox = import( "./object/SixPicBox").default;
     // SixPicBox(scene)
 
     // 创建 基础参考坐标
@@ -78,7 +79,8 @@ export default async () => {
     const followMouseObj = FollowMouseObj.getInstance(scene).mesh
     // 创建 场景板
     const SceneBoard = (await import ('./object/SceneBoard')).default
-    new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
+    const sceneBoard = new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
+    sceneBoard.groundBoard._removeLightSource(light2.light, false) // 下部场景版不受light2影响
 
     const interactiveObjs: (StickObject & { subPhysicMeshes?: BABYLON.Mesh[] })[] = [] // 交互对象
     const scalingTmpArr: BABYLON.Vector3[] = [] // 交互对象初始缩放值
@@ -87,7 +89,9 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("A", scene)
-        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.springStickPosition = new BABYLON.Vector3(-3, 14, -25)
+        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 9)
+        letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
         letterObj.mesh.position = new BABYLON.Vector3(-5, 8, -16)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
@@ -96,7 +100,9 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("B", scene)
-        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.springStickPosition = new BABYLON.Vector3(-3, 10, -17)
+        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 17)
+        letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
         letterObj.mesh.position = new BABYLON.Vector3(-5, 12, -6)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
@@ -105,7 +111,9 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("C", scene)
-        letterObj.mesh.scaling =  BABYLON.Vector3.One().scale(0.7)
+        letterObj.springStickPosition = new BABYLON.Vector3(-3, 6, -9)
+        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 25)
+        letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
         letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 3)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
@@ -113,9 +121,9 @@ export default async () => {
     }
     // 创建 方块
     const customObjOptions = [
-        {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 15, -12], staticStickPosition: [0, 11, -3], springStickPosition: [0, 12, -6]},
-        {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 13, -9], staticStickPosition: [0, 11, -1], springStickPosition: [0, 12, 0]},
-        {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 11, -6], staticStickPosition: [0, 9, 1], springStickPosition: [0, 12, 6]},
+        {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 15, -12], staticStickPosition: [0, 11, -3], springStickPosition: [0, 12, -4]},
+        {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 13, -9], staticStickPosition: [0, 11, -1], springStickPosition: [0, 16, 0]},
+        {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 11, -6], staticStickPosition: [0, 9, 1], springStickPosition: [0, 12, 4]},
         {name: "textBoxBlue4", option: {materialOpt: {textureUrl: AssetsImage.sideBlue4}}, initPosition: [0, 9, -3], staticStickPosition: [0, 9, -1], springStickPosition: [0, 8, -4]},
         {name: "textBoxBlue5", option: {materialOpt: {textureUrl: AssetsImage.sideBlue5}}, initPosition: [0, 11, 0], staticStickPosition: [0, 7, 1], springStickPosition: [0, 8, 4]},
         {name: "textBoxBlue6", option: {materialOpt: {textureUrl: AssetsImage.sideBlue6}}, initPosition: [0, 13, 3], staticStickPosition: [0, 7, 3], springStickPosition: [0, 4, 0]},
@@ -151,8 +159,8 @@ export default async () => {
     // 创建 细节碰撞模型物体
     const ModuleDiscObj = (await import("./object/ModuleDiscObj")).default
     const moduleDiscObj = new ModuleDiscObj('A', scene)
-    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 15, 10)
-    moduleDiscObj.springStickPosition = new BABYLON.Vector3(0, 15, -10)
+    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 15, -10)
+    moduleDiscObj.springStickPosition = new BABYLON.Vector3(0, 10, 10)
     interactiveObjs.push(moduleDiscObj)
     const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
         moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 16, -5)
@@ -198,6 +206,17 @@ export default async () => {
         document.body.appendChild(stats.dom)
     })
 
+    // 临时设置是否需要减少速度
+    let isNeedReduceVelocity = false
+    window.addEventListener('stateSpringStick', () => {
+        isNeedReduceVelocity = true
+    })
+    window.addEventListener('statePhysic', () => {
+        isNeedReduceVelocity = false
+    })
+    window.addEventListener('statePhysic', () => {
+        isNeedReduceVelocity = false
+    })
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
@@ -205,7 +224,10 @@ export default async () => {
             PhysicsStableHelper.limitMeshPosition(followMouseObj, sceneSize)
             PhysicsStableHelper.limitRotateVelocity(interactiveObjs.map(e => e.mesh))
             PhysicsStableHelper.limitLinearVelocity(interactiveObjs.map(e => e.mesh))
-            PhysicsStableHelper.reduceRotateVelocity([...interactiveObjs.slice(0, 6), ...interactiveObjs.slice(12)].map(e => e.mesh))
+            if (isNeedReduceVelocity) {
+                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => !e.mesh.name.startsWith('textBoxOrange')).map(e => e.mesh))
+                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => !e.mesh.name.startsWith('textBoxOrange')).map(e => e.mesh))
+            }
         }
         scene.render();
         stats?.end();
@@ -215,6 +237,5 @@ export default async () => {
     window.addEventListener('resize', () => {
         engine.resize();
     })
-
 
 }

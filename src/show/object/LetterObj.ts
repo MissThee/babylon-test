@@ -14,7 +14,7 @@ class LetterObj implements StickObject {
         this.mesh = new BABYLON.Mesh('letterObj-' + letter)
 
         const letterBlockScale = {
-            depth: 2,
+            depth: 3,
             width: 1,
             height: 1.5,
         }
@@ -62,7 +62,7 @@ class LetterObj implements StickObject {
 
 const createMaterial = (scene?: BABYLON.Scene) => {
     const material = new BABYLON.StandardMaterial('', scene)
-    material.ambientColor = new BABYLON.Color3(0.6, 0.5, 0.8).scale(0.95);
+    material.ambientColor = new BABYLON.Color3(0.9, 0.3, 0.6).scale(0.95);
     material.specularColor = BABYLON.Color3.Black();
     return material
 }

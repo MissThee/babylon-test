@@ -133,9 +133,10 @@ class StickHelper {
             inputEl.type = 'button'
             inputEl.id = 'stickPositionBtn'
             inputEl.style.display = 'block'
-            inputEl.value = '弹性钉住+无重力漂浮'
+            inputEl.value = '钉住+漂浮'
             inputEl.onclick = () => {
                 this.springStickAll()
+                window.dispatchEvent(new Event('stateSpringStick'))
             }
             document.getElementById('controls')?.append(inputEl)
         }
@@ -147,6 +148,7 @@ class StickHelper {
             inputEl.value = '掉落'
             inputEl.onclick = () => {
                 this.removeSpringStickAll()
+                window.dispatchEvent(new Event('statePhysic'))
             }
             document.getElementById('controls')?.append(inputEl)
         }
@@ -158,6 +160,7 @@ class StickHelper {
             inputEl.value = '静态钉住'
             inputEl.onclick = () => {
                 this.staticStickAll()
+                window.dispatchEvent(new Event('stateStatic'))
             }
             document.getElementById('controls')?.append(inputEl)
         }

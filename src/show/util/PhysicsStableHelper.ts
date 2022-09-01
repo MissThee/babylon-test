@@ -42,6 +42,16 @@ abstract class PhysicsStableHelper {
         }
     }
 
+    // 减少物体线速度
+    static reduceLinearVelocity(meshArr: BABYLON.Mesh[]) {
+        for (let mesh of Array.isArray(meshArr) ? meshArr : [meshArr]) {
+            const angularVelocity = mesh.physicsImpostor?.getLinearVelocity()
+            if (angularVelocity && !angularVelocity?.equals(BABYLON.Vector3.Zero())) {
+                mesh.physicsImpostor?.setLinearVelocity(angularVelocity.scale(0.9))
+            }
+        }
+    }
+
     // 限制物体角速度
     static limitRotateVelocity(meshArr: BABYLON.Mesh[]) {
         for (let mesh of Array.isArray(meshArr) ? meshArr : [meshArr]) {

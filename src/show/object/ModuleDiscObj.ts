@@ -39,7 +39,7 @@ class ModuleDiscObj implements StickObject {
                 m.name = 'letter-' + letter
                 m.receiveShadows = true
                 if (m.material) {
-                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
+                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White().scale(0.95); // 使用环境光辅助提高贴图亮度
                     (m.material as BABYLON.StandardMaterial).specularColor = BABYLON.Color3.Black();
                 }
                 this.mesh.addChild(m)

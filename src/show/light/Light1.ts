@@ -7,9 +7,9 @@ export default class Light1 {
 
     constructor(scene: BABYLON.Scene) {
         this.scene = scene
-        this.light = new BABYLON.DirectionalLight('light1', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，找不到的面全黑
+        this.light = new BABYLON.DirectionalLight('light1', new BABYLON.Vector3(0, -1, 0), scene); // 平行光，只照亮一个方向
         this.light.intensity = 1;
-        this.light.diffuse = new BABYLON.Color3(...sceneColor.map(e => e / 5));
+        this.light.diffuse = new BABYLON.Color3(...sceneColor.map(e => e / 5)); // this.light.diffuse = BABYLON.Color3.White() //
         // this.light.specular =  new BABYLON.Color3(247 / 5 / 255, 207 / 5 / 255, 212 / 5 / 255);
         this.light.position = new BABYLON.Vector3(0, 30, 0);
         // this.light.dispose()

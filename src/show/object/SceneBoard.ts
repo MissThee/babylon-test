@@ -1,11 +1,13 @@
 import * as BABYLON from '@babylonjs/core';
 import {sceneColor} from "../util/Constant";
+import {Mesh} from "@babylonjs/core";
 
 export default class SceneBoard {
     scene: BABYLON.Scene
     sideVerticalLength: number = 40
     sideHorizontalLength: number = 40
     deepLength: number = 10
+    groundBoard: BABYLON.Mesh
 
     constructor(scene: BABYLON.Scene, size?: { v: number, h: number, d: number }) {
         this.scene = scene
@@ -34,6 +36,7 @@ export default class SceneBoard {
             )
             ground.material = groundMaterial
             ground.receiveShadows = true
+            this.groundBoard = ground
         }
 
         // const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
