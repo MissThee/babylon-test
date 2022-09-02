@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import {sceneColor} from "../util/Constant";
 import {Mesh} from "@babylonjs/core";
+import DirectMeshAndShadowColorMaterial from "../util/DirectMeshAndShadowColorMaterial";
 
 export default class SceneBoard {
     scene: BABYLON.Scene
@@ -17,10 +18,7 @@ export default class SceneBoard {
 
         // 场景下部地板
         {
-            const groundMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
-            // 此颜色与光照颜色线性叠加
-            groundMaterial.emissiveColor = new BABYLON.Color3(...sceneColor.map(e => e / 5 * 4))
-            groundMaterial.specularColor = new BABYLON.Color3(0) // 去除高光反光
+
             let ground = BABYLON.MeshBuilder.CreateGround('ground', {
                 width: this.deepLength, // x轴方向宽度
                 height: this.sideVerticalLength, // z轴方向宽度
@@ -34,9 +32,15 @@ export default class SceneBoard {
                     friction: 1
                 }
             )
-            ground.material = groundMaterial
             ground.receiveShadows = true
+            // 调整阴影颜色
+            ground.material = new DirectMeshAndShadowColorMaterial({
+                shadowColor: new BABYLON.Color3(...sceneColor).scale(0.96),
+                meshColor: new BABYLON.Color3(...sceneColor)
+            }, scene)
+
             this.groundBoard = ground
+
         }
 
         // const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')

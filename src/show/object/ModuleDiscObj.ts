@@ -18,7 +18,7 @@ class ModuleDiscObj implements StickObject {
         this.scene = scene;
         const position = {x: 0, y: 0, z: 0}
 
-        this.mesh = new BABYLON.Mesh('wrapperMesh', this.scene) // BABYLON.MeshBuilder.CreateBox('', {size: 0.5}) //
+        this.mesh = new BABYLON.Mesh('moduleDiscObj', this.scene) // BABYLON.MeshBuilder.CreateBox('', {size: 0.5}) //
         this.mesh.isVisible = false
 
         const material = new BABYLON.StandardMaterial('')
@@ -39,7 +39,7 @@ class ModuleDiscObj implements StickObject {
                 m.name = 'letter-' + letter
                 m.receiveShadows = true
                 if (m.material) {
-                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White().scale(0.95); // 使用环境光辅助提高贴图亮度
+                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
                     (m.material as BABYLON.StandardMaterial).specularColor = BABYLON.Color3.Black();
                 }
                 this.mesh.addChild(m)

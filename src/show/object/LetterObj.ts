@@ -62,8 +62,10 @@ class LetterObj implements StickObject {
 
 const createMaterial = (scene?: BABYLON.Scene) => {
     const material = new BABYLON.StandardMaterial('', scene)
-    material.ambientColor = new BABYLON.Color3(0.9, 0.3, 0.6).scale(0.95);
-    material.specularColor = BABYLON.Color3.Black();
+    material.diffuseColor = new BABYLON.Color3(0.9, 0.3, 0.6);
+    material.ambientColor = new BABYLON.Color3(0.9, 0.3, 0.6);
+    // material.emissiveColor = new BABYLON.Color3(0.9, 0.3, 0.6);
+    // material.specularColor = BABYLON.Color3.Black();
     return material
 }
 

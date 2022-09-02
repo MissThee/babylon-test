@@ -27,8 +27,13 @@ class CustomObj implements StickObject {
         if (this.options?.materialOpt?.textureUrl) {
             const material = new BABYLON.StandardMaterial("textMaterial", this.scene);
             material.diffuseTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
-            material.emissiveColor = BABYLON.Color3.White().scale(0.95)
-            material.specularColor = BABYLON.Color3.Black()
+            // material.ambientTexture=new BABYLON.Texture(this.options?.materialOpt?.textureUrl);
+            // material.emissiveTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl); // 自发光材质，不受光照影响，仅受自身emissiveColor影响
+            // material.specularTexture = new BABYLON.Texture(this.options?.materialOpt?.textureUrl); // 高光材质，受光线specularColor和自身specularColor影响
+            // material.emissiveColor = BABYLON.Color3.White().scale(0.95) // 自发光颜色
+            material.ambientColor = BABYLON.Color3.White()
+            // material.specularColor = BABYLON.Color3.Black() // 高光颜色
+            // material.diffuseColor = BABYLON.Color3.Black() // 本身颜色，不会增加亮度，无光照不显示颜色
             this.mesh.material = material;
         }
     }

@@ -25,7 +25,7 @@ export default async () => {
     // 创建 场景
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
-    scene.ambientColor = new BABYLON.Color3(1, 1, 1); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
+    scene.ambientColor =  BABYLON.Color3.White(); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
     // 添加 物理引擎
     const cannon = await import('cannon')
     await import('@babylonjs/core/Physics/physicsEngineComponent')
@@ -51,24 +51,22 @@ export default async () => {
     Constant.canMoveCamera && camera.attachControl(scene.getEngine().getRenderingCanvas(), false)
 
     // 创建 光源
-    const Light1 = (await import("./light/Light1")).default
-    const light1 = new Light1(scene)
+    const GroundShadowLight = (await import("./light/GroundShadowLight")).default
+    const groundShadowLight = new GroundShadowLight(scene)
     // 创建 光源
-    const Light2 = (await import("./light/Light2")).default
-    const light2 = new Light2(scene)
+    const FrontLight = (await import("./light/FrontLight")).default
+    const frontLight = new FrontLight(scene)
 
     // 创建 影子生成器
     await import ('@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent')
-    const shadowGenerator = new BABYLON.ShadowGenerator(1024, light1.light);
+    const shadowGenerator = new BABYLON.ShadowGenerator(1024, groundShadowLight);
+    shadowGenerator.usePercentageCloserFiltering = true
 
     // 创建 点击声音
     const ClickSound = (await import("./sound/ClickSound")).default
     new ClickSound(scene)
 
     //------------------------------------------------------------------------------------------------------------
-
-    // const SixPicBox = import( "./object/SixPicBox").default;
-    // SixPicBox(scene)
 
     // 创建 基础参考坐标
     // const CoordinateLine = (await import("./util/CoordinateLine")).default
@@ -80,7 +78,10 @@ export default async () => {
     // 创建 场景板
     const SceneBoard = (await import ('./object/SceneBoard')).default
     const sceneBoard = new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
-    sceneBoard.groundBoard._removeLightSource(light2.light, false) // 下部场景版不受light2影响
+    sceneBoard.groundBoard.lightSources.forEach(e => {
+        e !== groundShadowLight  && sceneBoard.groundBoard._removeLightSource(e, false) // 下部场景版仅受light1影响
+    })
+    // groundShadowLight.includedOnlyMeshes=[sceneBoard.groundBoard]
 
     const interactiveObjs: (StickObject & { subPhysicMeshes?: BABYLON.Mesh[] })[] = [] // 交互对象
     const scalingTmpArr: BABYLON.Vector3[] = [] // 交互对象初始缩放值
@@ -160,7 +161,7 @@ export default async () => {
     const ModuleDiscObj = (await import("./object/ModuleDiscObj")).default
     const moduleDiscObj = new ModuleDiscObj('A', scene)
     moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 15, -10)
-    moduleDiscObj.springStickPosition = new BABYLON.Vector3(0, 10, 10)
+    moduleDiscObj.springStickPosition = new BABYLON.Vector3(8, 10, 10)
     interactiveObjs.push(moduleDiscObj)
     const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
         moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 16, -5)
@@ -176,7 +177,7 @@ export default async () => {
             await moduleObjPromise
             await moduleDiscObjPromise
             interactiveObjs.forEach(e => {
-                shadowGenerator.addShadowCaster(e.mesh); // 生成影子。自动包含children
+                shadowGenerator.addShadowCaster(e.mesh); // 生成影子。自动作用于children
             })
             const lastIndex = interactiveObjs.length - 1
             for (let index = 0; index < lastIndex; index++) {
@@ -197,7 +198,6 @@ export default async () => {
             const stickHelper = new StickHelper(scene, interactiveObjs)
             stickHelper.addTestButton()
         })
-
 
     // 性能监测
     let stats: Stats;
@@ -225,8 +225,8 @@ export default async () => {
             PhysicsStableHelper.limitRotateVelocity(interactiveObjs.map(e => e.mesh))
             PhysicsStableHelper.limitLinearVelocity(interactiveObjs.map(e => e.mesh))
             if (isNeedReduceVelocity) {
-                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => !e.mesh.name.startsWith('textBoxOrange')).map(e => e.mesh))
-                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => !e.mesh.name.startsWith('textBoxOrange')).map(e => e.mesh))
+                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => !(e.mesh.name.startsWith('textBoxOrange') || e.mesh.name.startsWith('moduleObj'))).map(e => e.mesh))
+                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => !(e.mesh.name.startsWith('textBoxOrange') || e.mesh.name.startsWith('moduleObj'))).map(e => e.mesh))
             }
         }
         scene.render();
