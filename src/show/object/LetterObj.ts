@@ -33,7 +33,7 @@ class LetterObj implements StickObject {
         }
         const material = createMaterial(scene)
         positionArr.forEach((position) => {
-            const physicMesh = BABYLON.MeshBuilder.CreateBox('', {
+            const physicMesh = BABYLON.MeshBuilder.CreateBox('letterSubObj-' + letter, {
                 width: letterBlockScale.depth,// 厚度
                 height: letterBlockScale.height, // 纵向粗细
                 depth: letterBlockScale.width, // 横向粗细
@@ -49,6 +49,7 @@ class LetterObj implements StickObject {
             this.mesh.addChild(physicMesh)
             this.subPhysicMeshes.push(physicMesh)
         })
+
     }
 
     usePhysicsImpostor() {
@@ -62,9 +63,11 @@ class LetterObj implements StickObject {
 
 const createMaterial = (scene?: BABYLON.Scene) => {
     const material = new BABYLON.StandardMaterial('', scene)
-    material.diffuseColor = new BABYLON.Color3(0.9, 0.3, 0.6);
-    material.ambientColor = new BABYLON.Color3(0.9, 0.3, 0.6);
-    // material.emissiveColor = new BABYLON.Color3(0.9, 0.3, 0.6);
+    const color = BABYLON.Color3.FromHexString('#2857ff')
+    // material.diffuseColor = color;
+    material.ambientColor = color.scale(0.5);
+    material.emissiveColor = material.ambientColor;
+    // material.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.8);
     // material.specularColor = BABYLON.Color3.Black();
     return material
 }

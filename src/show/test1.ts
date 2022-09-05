@@ -1,5 +1,4 @@
 import * as Constant from './util/Constant'
-import * as AssetsImage from '../../src/assets/image'
 import * as BABYLON from '@babylonjs/core';
 import PhysicsStableHelper from "./util/PhysicsStableHelper";
 import StickHelper, {StickObject} from "./util/Interaction/StickHelper"
@@ -25,7 +24,15 @@ export default async () => {
     // 创建 场景
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
-    scene.ambientColor =  BABYLON.Color3.White(); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
+    // scene.clearColor = new BABYLON.Color4(0,0,0,0) // 透明画布
+    // scene.autoClear = false // 不自动清除画布，只要局部没有新的绘制内容一直保留留内容
+    scene.ambientColor = BABYLON.Color3.White(); // 场景环境光。可让ambientTexture材质的颜色有效果，越大颜色越鲜艳
+    // let am = 1
+    // setInterval(() => {
+    //     am -= 0.01
+    //     scene.ambientColor = BABYLON.Color3.White().scale(am)
+    //     am <= 0 && (am = 1)
+    // }, 20)
     // 添加 物理引擎
     const cannon = await import('cannon')
     await import('@babylonjs/core/Physics/physicsEngineComponent')
@@ -79,7 +86,7 @@ export default async () => {
     const SceneBoard = (await import ('./object/SceneBoard')).default
     const sceneBoard = new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
     sceneBoard.groundBoard.lightSources.forEach(e => {
-        e !== groundShadowLight  && sceneBoard.groundBoard._removeLightSource(e, false) // 下部场景版仅受light1影响
+        e !== groundShadowLight && sceneBoard.groundBoard._removeLightSource(e, false) // 下部场景版仅受light1影响
     })
     // groundShadowLight.includedOnlyMeshes=[sceneBoard.groundBoard]
 
@@ -89,58 +96,89 @@ export default async () => {
     // 创建 组合字母
     {
         const LetterObj = (await import('./object/LetterObj')).default
-        const letterObj = new LetterObj("A", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-3, 14, -25)
-        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 9)
+        const letterObj = new LetterObj("D", scene)
+        letterObj.springStickPosition = new BABYLON.Vector3(1, 11, -12)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 14, -4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 8, -16)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, -16)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
     }
     {
         const LetterObj = (await import('./object/LetterObj')).default
-        const letterObj = new LetterObj("B", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-3, 10, -17)
-        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 17)
+        const letterObj = new LetterObj("E", scene)
+        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, -4)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 14, 4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 12, -6)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, -6)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
     }
     {
         const LetterObj = (await import('./object/LetterObj')).default
-        const letterObj = new LetterObj("C", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-3, 6, -9)
-        letterObj.staticStickPosition = new BABYLON.Vector3(3, 6, 25)
+        const letterObj = new LetterObj("M", scene)
+        letterObj.springStickPosition = new BABYLON.Vector3(1, 11, 4)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 6, -4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
         letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 3)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
     }
+    {
+        const LetterObj = (await import('./object/LetterObj')).default
+        const letterObj = new LetterObj("O", scene)
+        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, 12)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 6, 4)
+        letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 12)
+        interactiveObjs.push(letterObj)
+        scalingTmpArr.push(letterObj.mesh.scaling.clone())
+        letterObj.mesh.scaling = BABYLON.Vector3.Zero()
+    }
+
     // 创建 方块
-    const customObjOptions = [
-        {name: "textBoxBlue1", option: {materialOpt: {textureUrl: AssetsImage.sideBlue1}}, initPosition: [0, 15, -12], staticStickPosition: [0, 11, -3], springStickPosition: [0, 12, -4]},
-        {name: "textBoxBlue2", option: {materialOpt: {textureUrl: AssetsImage.sideBlue2}}, initPosition: [0, 13, -9], staticStickPosition: [0, 11, -1], springStickPosition: [0, 16, 0]},
-        {name: "textBoxBlue3", option: {materialOpt: {textureUrl: AssetsImage.sideBlue3}}, initPosition: [0, 11, -6], staticStickPosition: [0, 9, 1], springStickPosition: [0, 12, 4]},
-        {name: "textBoxBlue4", option: {materialOpt: {textureUrl: AssetsImage.sideBlue4}}, initPosition: [0, 9, -3], staticStickPosition: [0, 9, -1], springStickPosition: [0, 8, -4]},
-        {name: "textBoxBlue5", option: {materialOpt: {textureUrl: AssetsImage.sideBlue5}}, initPosition: [0, 11, 0], staticStickPosition: [0, 7, 1], springStickPosition: [0, 8, 4]},
-        {name: "textBoxBlue6", option: {materialOpt: {textureUrl: AssetsImage.sideBlue6}}, initPosition: [0, 13, 3], staticStickPosition: [0, 7, 3], springStickPosition: [0, 4, 0]},
-        {name: "textBoxOrange1", option: {materialOpt: {textureUrl: AssetsImage.sideOrange1}}, initPosition: [0, 10, 6], staticStickPosition: [0, 11, -5]},
-        {name: "textBoxOrange2", option: {materialOpt: {textureUrl: AssetsImage.sideOrange2}}, initPosition: [0, 13, 6], staticStickPosition: [0, 9, -5]},
-        {name: "textBoxOrange3", option: {materialOpt: {textureUrl: AssetsImage.sideOrange3}}, initPosition: [0, 16, 6], staticStickPosition: [0, 7, -5]},
-        {name: "textBoxOrange4", option: {materialOpt: {textureUrl: AssetsImage.sideOrange4}}, initPosition: [0, 19, 9], staticStickPosition: [0, 11, 5]},
-        {name: "textBoxOrange5", option: {materialOpt: {textureUrl: AssetsImage.sideOrange5}}, initPosition: [0, 16, 9], staticStickPosition: [0, 9, 5]},
-        {name: "textBoxOrange6", option: {materialOpt: {textureUrl: AssetsImage.sideOrange6}}, initPosition: [0, 13, 9], staticStickPosition: [0, 7, 5]},
+    const color1 = BABYLON.Color3.FromHexString('#3E77E9')
+    const color2 = BABYLON.Color3.FromHexString('#FF5952')
+
+    const customObjOptions: { initPosition: BABYLON.Vector3, staticStickPosition: BABYLON.Vector3, springStickPosition?: BABYLON.Vector3 }[] = [
+        {initPosition: new BABYLON.Vector3(0, 11, -15), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
+        {initPosition: new BABYLON.Vector3(0, 9, -12), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
+        {initPosition: new BABYLON.Vector3(0, 7, -9), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
+        {initPosition: new BABYLON.Vector3(0, 5, -6), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
+        {initPosition: new BABYLON.Vector3(0, 3, -3), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
+        {initPosition: new BABYLON.Vector3(0, 1, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
+
+        {initPosition: new BABYLON.Vector3(0, 11, -10), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
+        {initPosition: new BABYLON.Vector3(0, 9, -7), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
+        {initPosition: new BABYLON.Vector3(0, 7, -4), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
+        {initPosition: new BABYLON.Vector3(0, 5, -1), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
+        {initPosition: new BABYLON.Vector3(0, 3, 2), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
+        {initPosition: new BABYLON.Vector3(0, 1, 5), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
+
+        {initPosition: new BABYLON.Vector3(0, 11, -5), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
+        {initPosition: new BABYLON.Vector3(0, 9, -2), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
+        {initPosition: new BABYLON.Vector3(0, 7, 1), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
+        {initPosition: new BABYLON.Vector3(0, 5, 4), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
+        {initPosition: new BABYLON.Vector3(0, 3, 7), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
+        {initPosition: new BABYLON.Vector3(0, 1, 10), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
+
+        {initPosition: new BABYLON.Vector3(0, 11, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
+        {initPosition: new BABYLON.Vector3(0, 9, 3), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
+        {initPosition: new BABYLON.Vector3(0, 7, 6), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
+        {initPosition: new BABYLON.Vector3(0, 5, 9), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
+        {initPosition: new BABYLON.Vector3(0, 3, 12), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
+        {initPosition: new BABYLON.Vector3(0, 1, 15), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
     ]
+
     const CustomObj = (await import( './object/CustomObj')).default
     interactiveObjs.push(...customObjOptions.map((e) => {
-        const box = new CustomObj(e.name, e.option, scene)
-        e.staticStickPosition && (box.staticStickPosition = new BABYLON.Vector3(...e.staticStickPosition));
-        e.springStickPosition && (box.springStickPosition = new BABYLON.Vector3(...e.springStickPosition));
-        e.initPosition && (box.mesh.position = new BABYLON.Vector3(...e.initPosition))
+        const box = new CustomObj(scene)
+        e.staticStickPosition && (box.staticStickPosition = e.staticStickPosition);
+        e.springStickPosition && (box.springStickPosition = e.springStickPosition);
+        e.initPosition && (box.mesh.position = e.initPosition)
         scalingTmpArr.push(box.mesh.scaling.clone())
         box.mesh.scaling = BABYLON.Vector3.Zero()
         return box
@@ -149,10 +187,10 @@ export default async () => {
     // 创建 包裹模型物体
     const ModuleObj = (await import("./object/ModuleObj")).default
     const moduleObj = new ModuleObj(scene)
-    moduleObj.staticStickPosition = new BABYLON.Vector3(0, 15, 0)
+    moduleObj.staticStickPosition = new BABYLON.Vector3(0, 5, 10)
     interactiveObjs.push(moduleObj)
     const moduleObjPromise = moduleObj.modulePromise.then(() => {
-        moduleObj.mesh.position = new BABYLON.Vector3(0, 5, 5)
+        moduleObj.mesh.position = new BABYLON.Vector3(0, 4, 18)
         scalingTmpArr.push(moduleObj.mesh.scaling.clone())
         moduleObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
@@ -160,14 +198,31 @@ export default async () => {
     // 创建 细节碰撞模型物体
     const ModuleDiscObj = (await import("./object/ModuleDiscObj")).default
     const moduleDiscObj = new ModuleDiscObj('A', scene)
-    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 15, -10)
-    moduleDiscObj.springStickPosition = new BABYLON.Vector3(8, 10, 10)
+    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 13, 10)
+    moduleDiscObj.springStickPosition = new BABYLON.Vector3(7, 10, 18)
     interactiveObjs.push(moduleDiscObj)
     const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
-        moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 16, -5)
+        moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 10, 18)
         scalingTmpArr.push(moduleDiscObj.mesh.scaling.clone())
         moduleDiscObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
+
+    // 泛光效果
+    // const gl = new BABYLON.GlowLayer("glow", scene, {
+    //     mainTextureSamples: 4,
+    //     mainTextureFixedSize: 256,
+    //     blurKernelSize: 8, // 发光范围
+    // });
+    // gl.intensity = 0.5
+
+    // gl.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+    //     if (mesh.name === "colorBox") {
+    //         const color = (material as BABYLON.StandardMaterial).emissiveColor
+    //         result.set(color.r, color.g, color.b, 1);
+    //     } else {
+    //         result.set(0, 0, 0, 0);
+    //     }
+    // }
 
     let isEnableObjectPositionLimit = false
     // 初始化内容
@@ -225,8 +280,8 @@ export default async () => {
             PhysicsStableHelper.limitRotateVelocity(interactiveObjs.map(e => e.mesh))
             PhysicsStableHelper.limitLinearVelocity(interactiveObjs.map(e => e.mesh))
             if (isNeedReduceVelocity) {
-                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => !(e.mesh.name.startsWith('textBoxOrange') || e.mesh.name.startsWith('moduleObj'))).map(e => e.mesh))
-                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => !(e.mesh.name.startsWith('textBoxOrange') || e.mesh.name.startsWith('moduleObj'))).map(e => e.mesh))
+                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => e.mesh.name.startsWith('moduleDiscObj') || e.mesh.name.startsWith('letterObj')).map(e => e.mesh))
+                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => e.mesh.name.startsWith('moduleDiscObj') || e.mesh.name.startsWith('letterObj')).map(e => e.mesh))
             }
         }
         scene.render();

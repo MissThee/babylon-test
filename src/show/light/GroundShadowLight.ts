@@ -3,10 +3,11 @@ import * as BABYLON from '@babylonjs/core';
 export default class GroundShadowLight extends BABYLON.DirectionalLight {
     constructor(scene: BABYLON.Scene) {
         super('groundShadowLight', BABYLON.Vector3.Down(), scene)
-        this.intensity = 0.5;
+        this.intensity = 0.1;
         this.diffuse = BABYLON.Color3.White()
         this.specular = BABYLON.Color3.White().scale(0.2)
         this.position = BABYLON.Vector3.Up().scale(30); // 在此位置后方的物体不会生成阴影
+        // this.setEnabled(false)
     }
 }
 

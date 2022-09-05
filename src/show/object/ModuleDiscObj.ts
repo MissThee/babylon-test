@@ -25,7 +25,7 @@ class ModuleDiscObj implements StickObject {
         material.alpha = 0.5
         material.emissiveColor = BABYLON.Color3.Red()
 
-        this.buildSubMesh(letter)
+        this.buildSubMesh(letter) // 增加一些不可见的用于碰撞检测的子物体
         this.subPhysicMeshes.forEach(e => {
             // e.material = material
             e.isVisible = false
