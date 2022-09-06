@@ -1,0 +1,1 @@
+import{D as i,V as o,C as t}from"./test1.f9a123a5.js";import"../entry/index.a7674415.js";class h extends i{constructor(s){super("frontLight",new o(-1,0,0),s),this.intensity=.2,this.diffuse=t.White(),this.specular=t.Black()}}export{h as default};

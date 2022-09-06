@@ -1,0 +1,1 @@
+import{D as o,V as t,C as s}from"./test1.f9a123a5.js";import"../entry/index.a7674415.js";class h extends o{constructor(i){super("groundShadowLight",t.Down(),i),this.intensity=.1,this.diffuse=s.White(),this.specular=s.White().scale(.2),this.position=t.Up().scale(30)}}export{h as default};

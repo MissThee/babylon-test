@@ -20,7 +20,7 @@ export default async () => {
     document.getElementById('app')?.appendChild(canvasEl)
     // 创建 引擎
     await import ('@babylonjs/core/Audio/audioSceneComponent')// 引入声音插件
-    const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
+    const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, true);
     // 创建 场景
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
@@ -47,8 +47,8 @@ export default async () => {
     // 创建 相机
     const camera = new BABYLON.ArcRotateCamera(
         'ArcRotateCamera',
-        0,
-        0.5 * Math.PI,
+        -0.05 * Math.PI, // 0 x轴负向
+        0.45 * Math.PI, //0.5 * Math.PI 平视
         Constant.sceneDeep / 2 + Constant.cameraDistanceFix + Constant.cameraDistance,
         new BABYLON.Vector3(0, sceneSize.height / 2, 0),
         scene
@@ -97,10 +97,10 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("D", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(1, 11, -12)
-        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 14, -4)
+        letterObj.springStickPosition = new BABYLON.Vector3(1, 21, -12)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 24, -4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, -16)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 26, -16)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
@@ -108,10 +108,10 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("E", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, -4)
-        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 14, 4)
+        letterObj.springStickPosition = new BABYLON.Vector3(-1, 19, -4)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 24, 4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, -6)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 26, -6)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
@@ -119,10 +119,10 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("M", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(1, 11, 4)
-        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 6, -4)
+        letterObj.springStickPosition = new BABYLON.Vector3(1, 21, 4)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 16, -4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 3)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 26, 3)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
@@ -130,10 +130,10 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("O", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, 13)
-        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 6, 4)
+        letterObj.springStickPosition = new BABYLON.Vector3(-1, 19, 13)
+        letterObj.staticStickPosition = new BABYLON.Vector3(-8, 16, 4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
-        letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 12)
+        letterObj.mesh.position = new BABYLON.Vector3(-5, 26, 12)
         interactiveObjs.push(letterObj)
         scalingTmpArr.push(letterObj.mesh.scaling.clone())
         letterObj.mesh.scaling = BABYLON.Vector3.Zero()
@@ -141,33 +141,33 @@ export default async () => {
 
     // 创建 方块
     const customObjOptions: { initPosition: BABYLON.Vector3, staticStickPosition: BABYLON.Vector3, springStickPosition?: BABYLON.Vector3 }[] = [
-        {initPosition: new BABYLON.Vector3(0, 11, -15), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
-        {initPosition: new BABYLON.Vector3(0, 9, -12), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
-        {initPosition: new BABYLON.Vector3(0, 7, -9), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
-        {initPosition: new BABYLON.Vector3(0, 5, -6), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
-        {initPosition: new BABYLON.Vector3(0, 3, -3), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
-        {initPosition: new BABYLON.Vector3(0, 1, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
+        {initPosition: new BABYLON.Vector3(0, 16, -15), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
+        {initPosition: new BABYLON.Vector3(0, 14, -12), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
+        {initPosition: new BABYLON.Vector3(0, 12, -9), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
+        {initPosition: new BABYLON.Vector3(0, 10, -6), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
+        {initPosition: new BABYLON.Vector3(0, 8, -3), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
+        {initPosition: new BABYLON.Vector3(0, 6, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
 
-        {initPosition: new BABYLON.Vector3(0, 11, -10), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
-        {initPosition: new BABYLON.Vector3(0, 9, -7), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
-        {initPosition: new BABYLON.Vector3(0, 7, -4), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
-        {initPosition: new BABYLON.Vector3(0, 5, -1), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
-        {initPosition: new BABYLON.Vector3(0, 3, 2), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
-        {initPosition: new BABYLON.Vector3(0, 1, 5), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
+        {initPosition: new BABYLON.Vector3(0, 16, -10), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
+        {initPosition: new BABYLON.Vector3(0, 14, -7), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
+        {initPosition: new BABYLON.Vector3(0, 12, -4), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
+        {initPosition: new BABYLON.Vector3(0, 10, -1), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
+        {initPosition: new BABYLON.Vector3(0, 8, 2), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
+        {initPosition: new BABYLON.Vector3(0, 6, 5), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
 
-        {initPosition: new BABYLON.Vector3(0, 11, -5), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
-        {initPosition: new BABYLON.Vector3(0, 9, -2), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
-        {initPosition: new BABYLON.Vector3(0, 7, 1), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
-        {initPosition: new BABYLON.Vector3(0, 5, 4), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
-        {initPosition: new BABYLON.Vector3(0, 3, 7), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
-        {initPosition: new BABYLON.Vector3(0, 1, 10), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
+        {initPosition: new BABYLON.Vector3(0, 16, -5), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
+        {initPosition: new BABYLON.Vector3(0, 14, -2), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
+        {initPosition: new BABYLON.Vector3(0, 12, 1), staticStickPosition: new BABYLON.Vector3(-4, 11, 1)},
+        {initPosition: new BABYLON.Vector3(0, 10, 4), staticStickPosition: new BABYLON.Vector3(-4, 11, 3)},
+        {initPosition: new BABYLON.Vector3(0, 8, 7), staticStickPosition: new BABYLON.Vector3(-4, 9, 3)},
+        {initPosition: new BABYLON.Vector3(0, 6, 10), staticStickPosition: new BABYLON.Vector3(-4, 9, 1)},
 
-        {initPosition: new BABYLON.Vector3(0, 11, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
-        {initPosition: new BABYLON.Vector3(0, 9, 3), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
-        {initPosition: new BABYLON.Vector3(0, 7, 6), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
-        {initPosition: new BABYLON.Vector3(0, 5, 9), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
-        {initPosition: new BABYLON.Vector3(0, 3, 12), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
-        {initPosition: new BABYLON.Vector3(0, 1, 15), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
+        {initPosition: new BABYLON.Vector3(0, 16, 0), staticStickPosition: new BABYLON.Vector3(-4, 9, -1)},
+        {initPosition: new BABYLON.Vector3(0, 14, 3), staticStickPosition: new BABYLON.Vector3(-4, 9, -3)},
+        {initPosition: new BABYLON.Vector3(0, 12, 6), staticStickPosition: new BABYLON.Vector3(-4, 7, -3)},
+        {initPosition: new BABYLON.Vector3(0, 10, 9), staticStickPosition: new BABYLON.Vector3(-4, 7, -1)},
+        {initPosition: new BABYLON.Vector3(0, 8, 12), staticStickPosition: new BABYLON.Vector3(-4, 7, 1)},
+        {initPosition: new BABYLON.Vector3(0, 6, 15), staticStickPosition: new BABYLON.Vector3(-4, 7, 3)},
     ]
 
     const CustomObj = (await import( './object/CustomObj')).default
@@ -184,10 +184,10 @@ export default async () => {
     // 创建 包裹模型物体
     const ModuleObj = (await import("./object/ModuleObj")).default
     const moduleObj = new ModuleObj(scene)
-    moduleObj.staticStickPosition = new BABYLON.Vector3(0, 5, 10)
+    moduleObj.staticStickPosition = new BABYLON.Vector3(0, 15, 10)
     interactiveObjs.push(moduleObj)
     const moduleObjPromise = moduleObj.modulePromise.then(() => {
-        moduleObj.mesh.position = new BABYLON.Vector3(0, 4, 18)
+        moduleObj.mesh.position = new BABYLON.Vector3(0, 14, 18)
         scalingTmpArr.push(moduleObj.mesh.scaling.clone())
         moduleObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
@@ -195,11 +195,11 @@ export default async () => {
     // 创建 细节碰撞模型物体
     const ModuleDiscObj = (await import("./object/ModuleDiscObj")).default
     const moduleDiscObj = new ModuleDiscObj('A', scene)
-    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 13, 10)
+    moduleDiscObj.staticStickPosition = new BABYLON.Vector3(0, 23, 10)
     moduleDiscObj.springStickPosition = new BABYLON.Vector3(7, 10, 18)
     interactiveObjs.push(moduleDiscObj)
     const moduleDiscObjPromise = moduleDiscObj.modulePromise.then(() => {
-        moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 10, 18)
+        moduleDiscObj.mesh.position = new BABYLON.Vector3(0, 20, 18)
         scalingTmpArr.push(moduleDiscObj.mesh.scaling.clone())
         moduleDiscObj.mesh.scaling = BABYLON.Vector3.Zero()
     })
