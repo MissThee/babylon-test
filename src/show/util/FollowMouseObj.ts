@@ -43,9 +43,8 @@ export default class FollowMouseObj {
                         this.scene.activeCamera.getProjectionMatrix()
                     );
                     const dir = uvec.subtract(this.scene.activeCamera.position).normalize();
-                    // 调整此处坐标，可让方块落在垂直于轴的面上
-                    // const alwaysOnOnePlaneScale = -this.scene.activeCamera.position.x / dir.x;
-                    const scale = Math.sqrt(Math.pow(this.scene.activeCamera.position.x, 2) + Math.pow(this.scene.activeCamera.position.y, 2) + Math.pow(this.scene.activeCamera.position.z, 2))
+                    // const alwaysOnOnePlaneScale = -this.scene.activeCamera.position.x / dir.x; // 此值可让方块落在垂直于某轴的面上
+                    const scale = this.scene.activeCamera.position.length()
                     this.mesh.position = this.scene.activeCamera.position.clone().add(dir.scale(scale));
             }
         })

@@ -92,11 +92,10 @@ class ParticleFlare {
     start(vector3: BABYLON.Vector3) {
         if (this.scene.activeCamera) {
            const quaternionTmp = this.scene.activeCamera.absoluteRotation
-            // // 发射角度范围
+            // 发射角度范围（四棱锥相对的两个棱）
             this.particleSystem.direction1 = new BABYLON.Vector3(-1,-1,-1).applyRotationQuaternionInPlace(quaternionTmp).normalize()
             this.particleSystem.direction2 = new BABYLON.Vector3(1,1,-1).applyRotationQuaternionInPlace(quaternionTmp).normalize()
         }
-
         this.particleSystem.emitter = vector3.clone()
         this.particleSystem.start()
     }
