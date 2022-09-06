@@ -20,7 +20,7 @@ export default async () => {
     document.getElementById('app')?.appendChild(canvasEl)
     // 创建 引擎
     await import ('@babylonjs/core/Audio/audioSceneComponent')// 引入声音插件
-    const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, true);
+    const engine = new BABYLON.Engine(canvasEl, true, {preserveDrawingBuffer: true, stencil: true}, false);
     // 创建 场景
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(...Constant.sceneColor, 1)
