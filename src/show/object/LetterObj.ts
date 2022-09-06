@@ -1,7 +1,6 @@
 import {StickObject} from "../util/Interaction/StickHelper";
 import * as BABYLON from "@babylonjs/core";
 
-
 class LetterObj implements StickObject {
     scene?: BABYLON.Scene;
     mesh: BABYLON.Mesh;

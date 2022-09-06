@@ -69,19 +69,33 @@ abstract class PhysicsStableHelper {
 
     // 限制物体线速度
     static limitLinearVelocity(meshArr: BABYLON.Mesh[]) {
+        const maxSpeed = 100
         for (let mesh of Array.isArray(meshArr) ? meshArr : [meshArr]) {
             const linearVelocity = mesh.physicsImpostor?.getLinearVelocity()
             if (linearVelocity && !linearVelocity?.equals(BABYLON.Vector3.Zero())) {
-                const maxSpeed = 100
                 const speed = Math.sqrt((Math.pow(linearVelocity.x, 2) + Math.pow(linearVelocity.y, 2) + Math.pow(linearVelocity.z, 2)))
                 const scaleRate = maxSpeed / speed
                 if (scaleRate < 1) {
                     mesh.physicsImpostor?.setLinearVelocity(linearVelocity.scale(scaleRate))
-
                 }
             }
         }
     }
+
+    // 忽略过小的线速度
+    static ignoreMiniVelocity(meshArr: BABYLON.Mesh[]) {
+        const minSpeed = 0.05
+        for (let mesh of Array.isArray(meshArr) ? meshArr : [meshArr]) {
+            const linearVelocity = mesh.physicsImpostor?.getLinearVelocity()
+            if (linearVelocity && !linearVelocity?.equals(BABYLON.Vector3.Zero())) {
+                const speed = Math.sqrt((Math.pow(linearVelocity.x, 2) + Math.pow(linearVelocity.y, 2) + Math.pow(linearVelocity.z, 2)))
+                if (speed < minSpeed) {
+                    mesh.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero())
+                }
+            }
+        }
+    }
+
 }
 
 export default PhysicsStableHelper

@@ -1,5 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
-import {sceneColor} from "../util/Constant";
+import * as Constant from "../util/Constant";
 import DirectMeshAndShadowColorMaterial from "../util/DirectMeshAndShadowColorMaterial";
 
 export default class SceneBoard {
@@ -34,8 +34,8 @@ export default class SceneBoard {
             ground.receiveShadows = true
             // 调整阴影颜色
             ground.material = new DirectMeshAndShadowColorMaterial({
-                shadowColor: new BABYLON.Color3(...sceneColor).scale(0.94),
-                meshColor: new BABYLON.Color3(...sceneColor)
+                shadowColor: new BABYLON.Color3(...Constant.sceneColor).scale(0.94),
+                meshColor: new BABYLON.Color3(...Constant.sceneColor)
             }, scene)
 
             this.groundBoard = ground
@@ -43,7 +43,7 @@ export default class SceneBoard {
         }
 
         // const sideMaterial = new BABYLON.StandardMaterial('SceneBoardMaterial')
-        // sideMaterial.emissiveColor = new BABYLON.Color3(...sceneColor)
+        // sideMaterial.emissiveColor = new BABYLON.Color3(...Constant.sceneColor)
         // sideMaterial.specularColor = new BABYLON.Color3(0) // 去除高光反光
 
         {

@@ -17,7 +17,7 @@ class ModuleObj implements StickObject {
         this.mesh = BABYLON.MeshBuilder.CreateSphere('moduleObj', {}, this.scene)
         // this.mesh.isVisible = false
         const standardMaterial = new BABYLON.StandardMaterial('', scene)
-        standardMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0)
+        standardMaterial.emissiveColor = new BABYLON.Color3(0, 0, 1)
         standardMaterial.specularColor = BABYLON.Color3.Black();
         standardMaterial.alpha = 0.1
         this.mesh.material = standardMaterial
@@ -25,9 +25,8 @@ class ModuleObj implements StickObject {
         this.modulePromise = BABYLON.SceneLoader.ImportMeshAsync(null, "/module/", "letterA.gltf")
             .then(({meshes}) => {
                 const m = meshes[1]
-                if (m.material) {
-                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
-                    (m.material as BABYLON.StandardMaterial).specularColor = BABYLON.Color3.Black();
+                if (m.material instanceof BABYLON.PBRMaterial) {
+                    m.material.ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
                 }
                 this.mesh.addChild(m)
                 m.position.y -= 0.13

@@ -96,6 +96,9 @@ class StickHelper {
                 const stickObj = this.springStickInfoArr[i]
                 if (mainMesh.physicsImpostor && stickObj.pointMesh.physicsImpostor && stickObj.joint) {
                     this.scene.getPhysicsEngine()?.removeJoint(mainMesh.physicsImpostor, stickObj.pointMesh.physicsImpostor, stickObj.joint)
+                    // removeJoint不会清除mainImpostor中的joint数据，手动清除掉无用的joint
+                    // @ts-ignore
+                    mainMesh.physicsImpostor._joints.splice(mainMesh.physicsImpostor._joints.indexOf(stickObj.joint), 1)
                     stickObj.pointMesh.dispose()
                 }
                 if (mainMesh.physicsImpostor) {
@@ -133,7 +136,7 @@ class StickHelper {
             inputEl.type = 'button'
             inputEl.id = 'stickPositionBtn'
             inputEl.style.display = 'block'
-            inputEl.value = '钉住+漂浮'
+            inputEl.value = '漂浮'
             inputEl.onclick = () => {
                 this.springStickAll()
                 window.dispatchEvent(new Event('stateSpringStick'))
@@ -157,7 +160,7 @@ class StickHelper {
             inputEl.type = 'button'
             inputEl.id = 'lockStaticPositionBtn'
             inputEl.style.display = 'block'
-            inputEl.value = '静态钉住'
+            inputEl.value = '静态'
             inputEl.onclick = () => {
                 this.staticStickAll()
                 window.dispatchEvent(new Event('stateStatic'))

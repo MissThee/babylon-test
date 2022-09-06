@@ -81,7 +81,7 @@ export default async () => {
 
     // 创建 鼠标映射位置物体
     const FollowMouseObj = (await import( "./util/FollowMouseObj")).default;
-    const followMouseObj = FollowMouseObj.getInstance(scene).mesh
+    const followMouseMesh = FollowMouseObj.getInstance(scene).mesh
     // 创建 场景板
     const SceneBoard = (await import ('./object/SceneBoard')).default
     const sceneBoard = new SceneBoard(scene, {h: sceneSize.height, v: sceneSize.width, d: sceneSize.deep})
@@ -130,7 +130,7 @@ export default async () => {
     {
         const LetterObj = (await import('./object/LetterObj')).default
         const letterObj = new LetterObj("O", scene)
-        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, 12)
+        letterObj.springStickPosition = new BABYLON.Vector3(-1, 9, 13)
         letterObj.staticStickPosition = new BABYLON.Vector3(-8, 6, 4)
         letterObj.mesh.scaling = BABYLON.Vector3.One().scale(0.7)
         letterObj.mesh.position = new BABYLON.Vector3(-5, 16, 12)
@@ -140,9 +140,6 @@ export default async () => {
     }
 
     // 创建 方块
-    const color1 = BABYLON.Color3.FromHexString('#3E77E9')
-    const color2 = BABYLON.Color3.FromHexString('#FF5952')
-
     const customObjOptions: { initPosition: BABYLON.Vector3, staticStickPosition: BABYLON.Vector3, springStickPosition?: BABYLON.Vector3 }[] = [
         {initPosition: new BABYLON.Vector3(0, 11, -15), staticStickPosition: new BABYLON.Vector3(-4, 11, -3)},
         {initPosition: new BABYLON.Vector3(0, 9, -12), staticStickPosition: new BABYLON.Vector3(-4, 11, -1)},
@@ -208,12 +205,12 @@ export default async () => {
     })
 
     // 泛光效果
-    // const gl = new BABYLON.GlowLayer("glow", scene, {
-    //     mainTextureSamples: 4,
-    //     mainTextureFixedSize: 256,
-    //     blurKernelSize: 8, // 发光范围
-    // });
-    // gl.intensity = 0.5
+    const gl = new BABYLON.GlowLayer("glow", scene, {
+        mainTextureSamples: 4,
+        mainTextureFixedSize: 256,
+        blurKernelSize: 16, // 发光范围
+    });
+    gl.intensity = 0.45
 
     // gl.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
     //     if (mesh.name === "colorBox") {
@@ -225,6 +222,7 @@ export default async () => {
     // }
 
     let isEnableObjectPositionLimit = false
+
     // 初始化内容
     scene
         .whenReadyAsync(false)
@@ -261,28 +259,19 @@ export default async () => {
         document.body.appendChild(stats.dom)
     })
 
-    // 临时设置是否需要减少速度
-    let isNeedReduceVelocity = false
-    window.addEventListener('stateSpringStick', () => {
-        isNeedReduceVelocity = true
-    })
-    window.addEventListener('statePhysic', () => {
-        isNeedReduceVelocity = false
-    })
-    window.addEventListener('statePhysic', () => {
-        isNeedReduceVelocity = false
-    })
     // 循环渲染
     engine.runRenderLoop(() => {
         stats?.begin();
         if (isEnableObjectPositionLimit) {
-            PhysicsStableHelper.limitMeshPosition(followMouseObj, sceneSize)
+            PhysicsStableHelper.limitMeshPosition(followMouseMesh, sceneSize)
             PhysicsStableHelper.limitRotateVelocity(interactiveObjs.map(e => e.mesh))
             PhysicsStableHelper.limitLinearVelocity(interactiveObjs.map(e => e.mesh))
-            if (isNeedReduceVelocity) {
-                PhysicsStableHelper.reduceRotateVelocity(interactiveObjs.filter(e => e.mesh.name.startsWith('moduleDiscObj') || e.mesh.name.startsWith('letterObj')).map(e => e.mesh))
-                PhysicsStableHelper.reduceLinearVelocity(interactiveObjs.filter(e => e.mesh.name.startsWith('moduleDiscObj') || e.mesh.name.startsWith('letterObj')).map(e => e.mesh))
-            }
+            PhysicsStableHelper.ignoreMiniVelocity(interactiveObjs.map(e => e.mesh))
+            // 拥有4个以上弹性连接的mesh，需要降低速度
+            // @ts-ignore
+            const getSpringStickMeshArr = interactiveObjs.map(e => e.mesh).filter(e => e.physicsImpostor?._joints?.length >= 4)
+            PhysicsStableHelper.reduceRotateVelocity(getSpringStickMeshArr)
+            PhysicsStableHelper.reduceLinearVelocity(getSpringStickMeshArr)
         }
         scene.render();
         stats?.end();

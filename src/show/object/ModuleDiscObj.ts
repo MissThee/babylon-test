@@ -38,9 +38,10 @@ class ModuleDiscObj implements StickObject {
                 this.shadowMesh = m
                 m.name = 'letter-' + letter
                 m.receiveShadows = true
-                if (m.material) {
-                    (m.material as BABYLON.StandardMaterial).ambientColor = BABYLON.Color3.White(); // 使用环境光辅助提高贴图亮度
-                    (m.material as BABYLON.StandardMaterial).specularColor = BABYLON.Color3.Black();
+                console.log(m.material)
+                if (m.material instanceof BABYLON.PBRMaterial) {
+                    m.material.ambientColor = BABYLON.Color3.White().scale(1); // 使用环境光辅助提高贴图亮度
+                    // m.material.emissiveColor = BABYLON.Color3.White().scale(0.1);
                 }
                 this.mesh.addChild(m)
                 this.subPhysicMeshes.forEach(e => {

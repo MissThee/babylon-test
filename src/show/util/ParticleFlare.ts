@@ -24,7 +24,6 @@ class ParticleFlare {
         this.particleSystem.particleTexture = new BABYLON.Texture(AssetsImage.star);
         // this.particleSystem.renderingGroupId = 0 //可一直显示在最上面
 
-
         this.particleSystem.createPointEmitter(
             new BABYLON.Vector3(),
             new BABYLON.Vector3(),

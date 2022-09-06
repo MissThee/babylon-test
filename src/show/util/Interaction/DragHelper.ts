@@ -51,6 +51,9 @@ class DragHelper {
                 case BABYLON.PointerEventTypes.POINTERDOWN:
                     if (this.currentPickedMesh?.physicsImpostor && this.followMouseMesh.physicsImpostor && this.currentFollowJoint) {
                         this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseMesh.physicsImpostor, this.currentFollowJoint)
+                        // removeJoint不会清除mainImpostor中的joint数据，手动清除掉无用的joint
+                        // @ts-ignore
+                        this.currentPickedMesh.physicsImpostor._joints.splice(this.currentPickedMesh.physicsImpostor._joints.indexOf(this.currentFollowJoint), 1)
                         this.currentFollowJoint = null
                     }
                     this.currentPickedMesh = this.getDragMesh(pickingInfo?.pickedMesh)
@@ -108,6 +111,9 @@ class DragHelper {
                     case BABYLON.PointerEventTypes.POINTERUP:
                         if (this.currentPickedMesh?.physicsImpostor && this.followMouseMesh.physicsImpostor && this.currentFollowJoint) {
                             this.scene.getPhysicsEngine()?.removeJoint(this.currentPickedMesh.physicsImpostor, this.followMouseMesh.physicsImpostor, this.currentFollowJoint)
+                            // removeJoint不会清除mainImpostor中的joint数据，手动清除掉无用的joint
+                            // @ts-ignore
+                            this.currentPickedMesh.physicsImpostor._joints.splice(this.currentPickedMesh.physicsImpostor._joints.indexOf(this.currentFollowJoint), 1)
                             this.currentFollowJoint = null
                         }
                         break;
