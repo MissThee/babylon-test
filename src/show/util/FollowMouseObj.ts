@@ -16,7 +16,7 @@ export default class FollowMouseObj {
         this.scene = scene
         this.mesh = BABYLON.MeshBuilder.CreateSphere('FollowMouseObj', {segments: 1}, this.scene)
         this.mesh.isPickable = false
-        // this.mesh.isVisible = false
+        this.mesh.isVisible = false
         this.initImpostor()
         this.initFollowMouseAction()
     }
